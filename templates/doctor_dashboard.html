@@ -83,7 +83,76 @@ notifications
 {% else %}
 <p class="text-body-sm font-body-sm text-on-surface-variant">No upcoming appointments scheduled.</p>
 {% endif %}
+<p class="text-label-sm font-label-sm text-outline mt-1">{{ total_appointments }} total · {{ completed_appointments }} completed</p>
 </div>
+</div>
+
+<div class="col-span-12 md:col-span-6">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Urgent Alerts</h2>
+<a class="text-primary text-label-md font-label-md hover:underline" href="{{ url_for('doctor_patients') }}">See all</a>
+</div>
+{% if urgent_alerts %}
+<div class="flex flex-col gap-sm">
+{% for alert in urgent_alerts %}
+<a class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-error flex gap-md items-center hover:bg-surface-container-low transition-colors" href="{{ url_for('patient_detail', patient_id=alert.patient_id) }}">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container shrink-0 flex items-center justify-center">
+{% if alert.patient_photo %}
+<img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + alert.patient_photo) }}" alt="{{ alert.patient_name }}'s profile photo"/>
+{% else %}
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+{% endif %}
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start gap-sm">
+<span class="font-semibold text-body-lg">{{ alert.patient_name }}</span>
+<span class="text-error text-label-sm font-label-sm bg-error-container px-xs py-[2px] rounded shrink-0">{{ "Worsening symptoms" if alert.flag_reason == "worsening_symptoms" else "Missed doses" }}</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">{{ alert.created_at }}</p>
+</div>
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[100px]">
+<span class="material-symbols-outlined text-3xl">verified</span>
+<span class="font-label-md text-label-md">No active alerts.</span>
+</div>
+{% endif %}
+</div>
+
+<div class="col-span-12 md:col-span-6">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Upcoming Appointments</h2>
+<a class="text-primary text-label-md font-label-md hover:underline" href="{{ url_for('doctor_schedule') }}">Full Schedule</a>
+</div>
+{% if upcoming_appointments %}
+<div class="flex flex-col gap-sm">
+{% for appt in upcoming_appointments %}
+<a class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant flex gap-md items-center hover:bg-surface-container-low transition-colors" href="{{ url_for('patient_detail', patient_id=appt.patient_id) }}">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container shrink-0 flex items-center justify-center">
+{% if appt.patient_photo %}
+<img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + appt.patient_photo) }}" alt="{{ appt.patient_name }}'s profile photo"/>
+{% else %}
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+{% endif %}
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex items-center gap-xs">
+<span class="font-semibold text-body-lg">{{ appt.patient_name }}</span>
+{% if appt.appointment_type %}<span class="bg-primary-container/20 text-primary-container text-[10px] px-xs py-[1px] rounded-full font-bold uppercase">{{ appt.appointment_type }}</span>{% endif %}
+</div>
+<p class="text-body-sm text-on-surface-variant">{{ appt.appointment_at }}</p>
+</div>
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[100px]">
+<span class="material-symbols-outlined text-3xl">calendar_today</span>
+<span class="font-label-md text-label-md">No upcoming appointments.</span>
+</div>
+{% endif %}
 </div>
 
 <div class="col-span-12 md:col-span-8 bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
@@ -145,19 +214,35 @@ notifications
 <span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">person_add</span>
 <span class="font-label-md text-label-md">Add Patient</span>
 </a>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">edit_calendar</span>
-<span class="font-label-md text-label-md">Schedule</span>
+<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl hover:bg-primary-container hover:text-white transition-all group" onclick="document.getElementById('rx-form').classList.toggle('hidden')" type="button">
+<span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">edit_note</span>
+<span class="font-label-md text-label-md">Write Prescription</span>
 </button>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">clinical_notes</span>
-<span class="font-label-md text-label-md">Draft Notes</span>
-</button>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">mail</span>
-<span class="font-label-md text-label-md">Consults</span>
-</button>
+<a class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl hover:bg-primary-container hover:text-white transition-all group" href="{{ url_for('doctor_patients') }}">
+<span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">group</span>
+<span class="font-label-md text-label-md">Patient List</span>
+</a>
+<a class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl hover:bg-primary-container hover:text-white transition-all group" href="{{ url_for('doctor_reports') }}">
+<span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">history</span>
+<span class="font-label-md text-label-md">Lab History</span>
+</a>
 </div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hidden" id="rx-form">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-md uppercase tracking-wider">Write Prescription</h3>
+<form class="flex flex-col gap-sm" method="POST" action="{{ url_for('new_prescription_any_patient') }}">
+<select class="w-full h-[44px] bg-surface-container-low border border-outline-variant rounded-lg px-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" name="patient_id" required>
+<option disabled selected value="">Select a patient</option>
+{% for p in patients %}
+<option value="{{ p.id }}">{{ p.name }}</option>
+{% endfor %}
+</select>
+<input class="w-full h-[44px] bg-surface-container-low border border-outline-variant rounded-lg px-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" name="medication_name" placeholder="Medication name" required type="text"/>
+<input class="w-full h-[44px] bg-surface-container-low border border-outline-variant rounded-lg px-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" name="dosage" placeholder="Dosage (e.g. 10mg daily)" type="text"/>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none" name="instructions" placeholder="Instructions (optional)" rows="2"></textarea>
+<input class="w-full h-[44px] bg-surface-container-low border border-outline-variant rounded-lg px-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" name="prescribed_date" type="date"/>
+<button class="bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md" type="submit">Save Prescription</button>
+</form>
 </div>
 </div>
 </div>

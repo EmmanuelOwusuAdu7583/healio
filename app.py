@@ -492,6 +492,27 @@ def doctor_dashboard():
     """, (session["doctor_id"], datetime.now().isoformat()))
     next_appointment = cursor.fetchone()
 
+    cursor.execute("SELECT COUNT(*) as c FROM appointments WHERE doctor_id = ?", (session["doctor_id"],))
+    total_appointments = cursor.fetchone()["c"]
+    cursor.execute("SELECT COUNT(*) as c FROM appointments WHERE doctor_id = ? AND status = 'completed'", (session["doctor_id"],))
+    completed_appointments = cursor.fetchone()["c"]
+
+    cursor.execute("""
+        SELECT f.*, p.name as patient_name, p.photo_filename as patient_photo FROM flags f
+        JOIN patients p ON f.patient_id = p.id
+        WHERE p.doctor_id = ? AND f.resolved = 0
+        ORDER BY f.created_at DESC LIMIT 5
+    """, (session["doctor_id"],))
+    urgent_alerts = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT a.*, p.name as patient_name, p.photo_filename as patient_photo FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        WHERE a.doctor_id = ? AND a.appointment_at >= ? AND (a.status IS NULL OR a.status = 'scheduled')
+        ORDER BY a.appointment_at ASC LIMIT 5
+    """, (session["doctor_id"], datetime.now().isoformat()))
+    upcoming_appointments = cursor.fetchall()
+
     conn.close()
 
     total_patients = len(patients)
@@ -512,6 +533,10 @@ def doctor_dashboard():
         flagged_count=flagged_count,
         todays_appointment_count=todays_appointment_count,
         next_appointment=next_appointment,
+        total_appointments=total_appointments,
+        completed_appointments=completed_appointments,
+        urgent_alerts=urgent_alerts,
+        upcoming_appointments=upcoming_appointments,
         active="home",
         greeting=greeting,
     )
@@ -762,6 +787,42 @@ def new_prescription(patient_id):
 
     conn.close()
     return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
+@app.route("/doctor/prescriptions/new", methods=["POST"])
+@login_required_doctor
+def new_prescription_any_patient():
+    patient_id = request.form.get("patient_id", "")
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM patients WHERE id = ? AND doctor_id = ?", (patient_id, session["doctor_id"]))
+    patient = cursor.fetchone()
+    if not patient:
+        conn.close()
+        flash("Select a valid patient.")
+        return redirect(url_for("doctor_dashboard"))
+
+    medication_name = request.form.get("medication_name", "").strip()
+    dosage = request.form.get("dosage", "").strip()
+    instructions = request.form.get("instructions", "").strip()
+    prescribed_date = request.form.get("prescribed_date", "").strip()
+
+    if medication_name:
+        cursor.execute("""
+            INSERT INTO prescriptions (patient_id, doctor_id, medication_name, dosage, instructions, prescribed_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], medication_name, dosage, instructions, prescribed_date))
+        conn.commit()
+        flash("Prescription added.")
+        create_notification(
+            "patient", patient_id,
+            f"{session['doctor_name']} added a new prescription: {medication_name}",
+            url_for("patient_reports"),
+        )
+
+    conn.close()
+    return redirect(url_for("doctor_dashboard"))
 
 
 @app.route("/doctor/flags/<int:flag_id>/resolve", methods=["POST"])
