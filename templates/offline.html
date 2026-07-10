@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | You're Offline" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center px-margin-mobile text-center">
+<div class="w-20 h-20 rounded-full bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined text-outline text-4xl">wifi_off</span>
+</div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface mb-xs">You're offline</h1>
+<p class="text-body-lg text-on-surface-variant max-w-[320px] mb-xl">Healio needs an internet connection to load your latest data. Check your connection and try again.</p>
+<button class="bg-primary text-on-primary px-xl py-md rounded-full font-headline-md text-headline-md shadow-lg hover:brightness-110 transition-all" onclick="window.location.reload()">
+Try Again
+</button>
+</body></html>

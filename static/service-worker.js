@@ -1,8 +1,10 @@
-const CACHE_NAME = "healio-v1";
+const CACHE_NAME = "healio-v2";
+const OFFLINE_URL = "/offline";
 const APP_SHELL = [
   "/",
   "/doctor/login",
   "/patient/login",
+  OFFLINE_URL,
   "/static/css/style.css",
   "/static/manifest.json",
   "/static/images/logo.jpg",
@@ -50,7 +52,9 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Network-first for everything else (dynamic pages) so patient/doctor
-  // data is always fresh online, falling back to a cached shell offline.
+  // data is always fresh online. Offline: serve this exact page from cache
+  // if we have it, otherwise show the real offline page — not some
+  // unrelated cached page pretending to be the one the user asked for.
   event.respondWith(
     fetch(request)
       .then((response) => {
@@ -58,6 +62,12 @@ self.addEventListener("fetch", (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         return response;
       })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
+      .catch(() =>
+        caches.match(request).then((cached) => {
+          if (cached) return cached;
+          if (request.mode === "navigate") return caches.match(OFFLINE_URL);
+          return Response.error();
+        })
+      )
   );
 });

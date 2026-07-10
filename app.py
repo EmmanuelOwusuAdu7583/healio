@@ -406,6 +406,11 @@ def service_worker():
     return send_from_directory(app.static_folder, "service-worker.js")
 
 
+@app.route("/offline")
+def offline():
+    return render_template("offline.html")
+
+
 @app.route("/logout")
 def logout():
     session.clear()
