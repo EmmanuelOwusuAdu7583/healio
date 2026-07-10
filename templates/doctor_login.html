@@ -38,7 +38,7 @@
 <div class="space-y-xs">
 <div class="flex justify-between items-center px-1">
 <label class="text-label-md font-label-md text-on-surface-variant" for="password">Password</label>
-<a class="text-label-md font-label-md text-primary hover:underline" href="#">Forgot?</a>
+<button class="text-label-md font-label-md text-primary hover:underline" type="button" onclick="openContactModal()">Forgot?</button>
 </div>
 <div class="relative group">
 <div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none">
@@ -62,20 +62,22 @@ Login
 <div class="mt-xl text-center space-y-md">
 <p class="text-body-sm text-on-surface-variant">
 Need technical support?
-<a class="text-primary font-semibold hover:underline" href="#">Contact IT Helpdesk</a>
+<button class="text-primary font-semibold hover:underline" type="button" onclick="openContactModal()">Contact IT Helpdesk</button>
 </p>
 <p class="text-body-sm text-on-surface-variant">Are you a patient? <a class="text-primary font-semibold hover:underline" href="{{ url_for('patient_login') }}">Sign in here</a></p>
-<div class="flex items-center justify-center gap-md pt-md">
-<div class="h-[1px] bg-outline-variant flex-grow max-w-[40px]"></div>
-<span class="text-label-sm font-label-sm text-outline uppercase tracking-widest">Biometric access</span>
-<div class="h-[1px] bg-outline-variant flex-grow max-w-[40px]"></div>
-</div>
-<button class="inline-flex items-center gap-sm px-lg py-sm rounded-full border border-outline-variant hover:bg-surface-container transition-colors text-on-surface-variant" type="button">
-<span class="material-symbols-outlined">fingerprint</span>
-<span class="text-label-md font-label-md">Sign in with Face ID / Touch ID</span>
-</button>
 </div>
 </main>
+<div class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-lg hidden opacity-0 transition-opacity duration-300" id="contact-modal">
+<div class="bg-surface-container-lowest rounded-xl p-xl max-w-sm w-full text-center shadow-xl">
+<div class="w-16 h-16 rounded-full mx-auto mb-lg flex items-center justify-center bg-primary-container/20">
+<span class="material-symbols-outlined text-4xl text-primary">support_agent</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-xs">Contact your administrator</h3>
+<p class="text-body-lg text-on-surface-variant mb-md">Password resets for doctor accounts are handled by your Healio administrator, not automatically. Reach out and they'll issue you a new one.</p>
+<a class="block font-semibold text-primary hover:underline mb-xl" href="mailto:{{ admin_contact_email }}">{{ admin_contact_email }}</a>
+<button class="w-full py-md bg-primary text-on-primary rounded-xl font-semibold" onclick="closeContactModal()">Got it</button>
+</div>
+</div>
 <footer class="mt-auto py-lg px-margin-mobile text-center">
 <div class="flex justify-center items-center gap-xs mb-sm">
 <div class="w-2 h-2 rounded-full bg-secondary"></div>
@@ -94,5 +96,16 @@ Authorized personnel only. All access is logged and monitored for compliance wit
             passwordInput.setAttribute('type', type);
             toggleBtn.querySelector('span').textContent = type === 'password' ? 'visibility' : 'visibility_off';
         });
+
+        function openContactModal() {
+            const modal = document.getElementById('contact-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+        function closeContactModal() {
+            const modal = document.getElementById('contact-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
     </script>
 </body></html>

@@ -9,14 +9,6 @@
 <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
 <span class="text-headline-md font-headline-md text-primary">Healio</span>
 </div>
-<div class="flex items-center gap-4">
-<button class="hover:bg-surface-container p-2 rounded-full transition-all duration-150 active:scale-[0.98]">
-<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-</button>
-<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden">
-<img class="w-full h-full object-cover" alt="A professional medical profile avatar of a healthcare provider wearing a clean white lab coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR-ukOX6QQl_Pha5f0fdEmZgwOi-ncprra5ucfmnjsQX22Hn84djGBWI5Xzq2QB_CH2sjCRIn-Lfs00k2E-xIAafduQkCssxzq1SAFquFT2QqDI1h9qbFyAc1QNT3uWZs_7fWH4rjYcPB3a0gy70FlZALwjiEyygrGRiQjJzrJtvqpUe2kLc7mg7NqHThO_aqpjEZXOgs4da2QXr2pxPI8HfGUV7Ahg2FLta4BmlPXFgMcFD1GpjRioADMf0LOS6rKAp6U3952XBw"/>
-</div>
-</div>
 </header>
 <main class="flex-grow flex flex-col items-center justify-center pt-24 pb-16 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
 <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -87,10 +79,10 @@ Access Health
 <span class="font-bold text-primary">Healio</span>
 </div>
 <nav class="flex gap-lg flex-wrap justify-center">
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Help Center</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('privacy') }}">Privacy Policy</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('terms') }}">Terms of Service</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('help_center') }}">Help Center</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('contact') }}">Contact Support</a>
 </nav>
 <div class="text-label-sm font-label-sm text-outline">
 © 2026 Healio Health Systems. All rights reserved.

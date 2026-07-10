@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Contact Support" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+{% set static_page_title = "Contact Support" %}
+{% include "_static_page_header.html" %}
+<main class="flex-grow px-margin-mobile py-xl md:max-w-[640px] md:mx-auto w-full space-y-lg">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg">
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-xs">Patients</h2>
+<p class="text-body-md text-on-surface-variant">Contact your doctor's office directly — they issued your account and can help with login issues or questions about your care.</p>
+</div>
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg">
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-xs">Doctors &amp; technical issues</h2>
+<p class="text-body-md text-on-surface-variant mb-sm">For account issues, bugs, or anything else related to the platform, email the pilot administrator:</p>
+<a class="text-primary font-semibold hover:underline" href="mailto:{{ admin_contact_email }}">{{ admin_contact_email }}</a>
+</div>
+</main>
+<footer class="mt-auto py-lg px-margin-mobile text-center">
+<p class="text-label-sm font-label-sm text-outline">© 2026 Healio Health Systems.</p>
+</footer>
+</body></html>

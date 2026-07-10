@@ -9,6 +9,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "healio-fallback-key-for-local-dev-only")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "healio-fallback-admin-for-local-dev-only")
+ADMIN_CONTACT_EMAIL = os.environ.get("ADMIN_CONTACT_EMAIL", "admin@healio.local")
+app.permanent_session_lifetime = timedelta(days=30)
 
 DB_PATH = "healio.db"
 
@@ -119,6 +121,18 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            recipient_type TEXT NOT NULL,
+            recipient_id INTEGER NOT NULL,
+            message TEXT NOT NULL,
+            link TEXT,
+            read_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -162,10 +176,34 @@ def admin_required(f):
     return decorated
 
 
+def create_notification(recipient_type, recipient_id, message, link=None):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO notifications (recipient_type, recipient_id, message, link)
+        VALUES (?, ?, ?, ?)
+    """, (recipient_type, recipient_id, message, link))
+    conn.commit()
+    conn.close()
+
+
 def check_and_create_flags(patient_id):
     """Run after check-ins / weekly reports. Flags missed doses and worsening symptom trends."""
     conn = get_db()
     cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT p.name, p.doctor_id FROM patients p WHERE p.id = ?
+    """, (patient_id,))
+    patient_row = cursor.fetchone()
+    patient_name = patient_row["name"]
+    doctor_id = patient_row["doctor_id"]
+
+    def notify_doctor_of_flag(reason_label):
+        cursor.execute("""
+            INSERT INTO notifications (recipient_type, recipient_id, message, link)
+            VALUES ('doctor', ?, ?, ?)
+        """, (doctor_id, f"New alert for {patient_name}: {reason_label}", url_for("patient_detail", patient_id=patient_id)))
 
     # Missed dose flag: last 2 daily check-ins both "No"
     cursor.execute("""
@@ -182,6 +220,7 @@ def check_and_create_flags(patient_id):
             cursor.execute("""
                 INSERT INTO flags (patient_id, flag_reason) VALUES (?, 'missed_doses')
             """, (patient_id,))
+            notify_doctor_of_flag("missed doses")
 
     # Worsening symptoms flag: last 2 weekly reports both "worse"
     cursor.execute("""
@@ -198,9 +237,37 @@ def check_and_create_flags(patient_id):
             cursor.execute("""
                 INSERT INTO flags (patient_id, flag_reason) VALUES (?, 'worsening_symptoms')
             """, (patient_id,))
+            notify_doctor_of_flag("worsening symptoms")
 
     conn.commit()
     conn.close()
+
+
+@app.context_processor
+def inject_admin_contact_email():
+    return {"admin_contact_email": ADMIN_CONTACT_EMAIL}
+
+
+@app.context_processor
+def inject_notifications():
+    recipient_type = recipient_id = None
+    if "doctor_id" in session:
+        recipient_type, recipient_id = "doctor", session["doctor_id"]
+    elif "patient_id" in session:
+        recipient_type, recipient_id = "patient", session["patient_id"]
+
+    if not recipient_type:
+        return {"unread_notifications_count": 0}
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT COUNT(*) as c FROM notifications
+        WHERE recipient_type = ? AND recipient_id = ? AND read_at IS NULL
+    """, (recipient_type, recipient_id))
+    count = cursor.fetchone()["c"]
+    conn.close()
+    return {"unread_notifications_count": count}
 
 
 # ---------- Public / Welcome ----------
@@ -375,6 +442,11 @@ def patient_detail(patient_id):
                 INSERT INTO doctor_notes (patient_id, doctor_id, note_text) VALUES (?, ?, ?)
             """, (patient_id, session["doctor_id"], note_text))
             conn.commit()
+            create_notification(
+                "patient", patient_id,
+                f"Dr. {session['doctor_name']} added a new note to your file",
+                url_for("patient_notes"),
+            )
 
     cursor.execute("""
         SELECT * FROM weekly_reports WHERE patient_id = ? ORDER BY week_number DESC
@@ -452,6 +524,11 @@ def new_appointment(patient_id):
         """, (patient_id, session["doctor_id"], appointment_at, notes))
         conn.commit()
         flash("Appointment scheduled.")
+        create_notification(
+            "patient", patient_id,
+            f"New appointment scheduled for {appointment_at}",
+            url_for("patient_checkin"),
+        )
 
     conn.close()
     return redirect(url_for("patient_detail", patient_id=patient_id))
@@ -470,6 +547,54 @@ def resolve_flag(flag_id):
     patient_id = request.form.get("patient_id")
     conn.close()
     return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
+@app.route("/doctor/notifications")
+@login_required_doctor
+def doctor_notifications():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM notifications WHERE recipient_type = 'doctor' AND recipient_id = ?
+        ORDER BY created_at DESC
+    """, (session["doctor_id"],))
+    notifications = cursor.fetchall()
+    cursor.execute("""
+        UPDATE notifications SET read_at = CURRENT_TIMESTAMP
+        WHERE recipient_type = 'doctor' AND recipient_id = ? AND read_at IS NULL
+    """, (session["doctor_id"],))
+    conn.commit()
+    conn.close()
+    return render_template("doctor_notifications.html", notifications=notifications)
+
+
+@app.route("/doctor/profile")
+@login_required_doctor
+def doctor_profile():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM doctors WHERE id = ?", (session["doctor_id"],))
+    doctor = cursor.fetchone()
+    cursor.execute("SELECT COUNT(*) as c FROM patients WHERE doctor_id = ?", (session["doctor_id"],))
+    patient_count = cursor.fetchone()["c"]
+    conn.close()
+    return render_template("doctor_profile.html", doctor=doctor, patient_count=patient_count)
+
+
+@app.route("/doctor/schedule")
+@login_required_doctor
+def doctor_schedule():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT a.*, p.name as patient_name FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        WHERE a.doctor_id = ?
+        ORDER BY a.appointment_at ASC
+    """, (session["doctor_id"],))
+    appointments = cursor.fetchall()
+    conn.close()
+    return render_template("doctor_schedule.html", appointments=appointments, active="schedule")
 
 
 # ---------- Patient ----------
@@ -492,6 +617,7 @@ def patient_login():
         conn.close()
 
         if patient and patient["password"] == password:
+            session.permanent = request.form.get("remember_device") == "yes"
             session["patient_id"] = patient["id"]
             session["patient_name"] = patient["name"]
             return redirect(url_for("patient_dashboard"))
@@ -689,6 +815,62 @@ def patient_notes():
     notes = cursor.fetchall()
     conn.close()
     return render_template("patient_notes.html", notes=notes, active="notes")
+
+
+@app.route("/patient/notifications")
+@login_required_patient
+def patient_notifications():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM notifications WHERE recipient_type = 'patient' AND recipient_id = ?
+        ORDER BY created_at DESC
+    """, (session["patient_id"],))
+    notifications = cursor.fetchall()
+    cursor.execute("""
+        UPDATE notifications SET read_at = CURRENT_TIMESTAMP
+        WHERE recipient_type = 'patient' AND recipient_id = ? AND read_at IS NULL
+    """, (session["patient_id"],))
+    conn.commit()
+    conn.close()
+    return render_template("patient_notifications.html", notifications=notifications)
+
+
+@app.route("/patient/profile")
+@login_required_patient
+def patient_profile():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.*, d.name as doctor_name, d.doctor_code FROM patients p
+        JOIN doctors d ON p.doctor_id = d.id
+        WHERE p.id = ?
+    """, (session["patient_id"],))
+    patient = cursor.fetchone()
+    conn.close()
+    return render_template("patient_profile.html", patient=patient)
+
+
+# ---------- Static info pages ----------
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/help")
+def help_center():
+    return render_template("help.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
 
 
 # ---------- App startup ----------

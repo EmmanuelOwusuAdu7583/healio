@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Schedule" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-24 md:pb-0">
+<header class="fixed top-0 left-0 w-full z-50 bg-background flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 transition-all duration-300">
+<div class="flex items-center gap-xs">
+<span class="text-primary font-headline-md text-headline-md tracking-tight">Healio</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<nav class="flex items-center gap-md">
+<a class="{{ 'text-primary bg-primary-container' if active == 'home' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all duration-150" href="{{ url_for('doctor_dashboard') }}">Home</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_dashboard') }}">Patients</a>
+<a class="{{ 'text-primary bg-primary-container' if active == 'schedule' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_schedule') }}">Schedule</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<a class="relative material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('doctor_notifications') }}" aria-label="Notifications">
+notifications
+{% if unread_notifications_count %}
+<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-error"></span>
+{% endif %}
+</a>
+<a class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
+<a class="flex items-center gap-sm" href="{{ url_for('doctor_profile') }}">
+<span class="hidden md:block text-right">
+<p class="font-label-md text-label-md text-on-surface">Dr. {{ session.doctor_name }}</p>
+</span>
+<div class="w-10 h-10 rounded-full border-2 border-primary-fixed overflow-hidden flex items-center justify-center bg-surface-container-highest">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+</a>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-[1000px] mx-auto">
+{% include "_stitch_flash.html" %}
+<section class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Schedule</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">All upcoming and past appointments across your patients.</p>
+</section>
+{% if appointments %}
+<div class="flex flex-col gap-sm">
+{% for appt in appointments %}
+<a class="bento-card bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex items-center justify-between" href="{{ url_for('patient_detail', patient_id=appt.patient_id) }}">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">{{ appt.patient_name }}</p>
+<p class="text-on-surface-variant font-body-sm">{{ appt.appointment_at }}{% if appt.notes %} — {{ appt.notes }}{% endif %}</p>
+</div>
+</div>
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[160px]">
+<span class="material-symbols-outlined text-3xl">calendar_today</span>
+<span class="font-label-md text-label-md">No appointments scheduled yet.</span>
+</div>
+{% endif %}
+</main>
+{% include "_stitch_doctor_bottomnav.html" %}
+</body></html>

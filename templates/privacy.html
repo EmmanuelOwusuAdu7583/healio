@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Privacy Policy" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+{% set static_page_title = "Privacy Policy" %}
+{% include "_static_page_header.html" %}
+<main class="flex-grow px-margin-mobile py-xl md:max-w-[640px] md:mx-auto w-full space-y-md text-body-md text-on-surface-variant">
+<p class="text-label-sm text-outline uppercase">Last updated 2026</p>
+<p>Healio is a research-portfolio pilot for medication adherence and symptom tracking, built to support a small number of doctor-patient pairs in a closed trial. It is not a commercial product.</p>
+<h2 class="text-headline-sm font-headline-sm text-on-surface pt-md">What we collect</h2>
+<p>Doctors enter basic clinical information about their patients (diagnosis, medication, treatment duration). Patients enter daily check-ins and weekly symptom reports. This data is stored to power the dashboard, adherence tracking, and automatic risk flagging that doctors use to monitor their patients.</p>
+<h2 class="text-headline-sm font-headline-sm text-on-surface pt-md">Who can see it</h2>
+<p>Only the assigned doctor for a given patient, and the pilot administrator, can see a patient's data. Patients can see their own check-ins, reports, and notes their doctor has written.</p>
+<h2 class="text-headline-sm font-headline-sm text-on-surface pt-md">Account access</h2>
+<p>Accounts are created by the administrator or a doctor — there is no open sign-up. If you lose your login details, contact your doctor or the administrator directly; see the <a class="text-primary hover:underline" href="{{ url_for('contact') }}">Contact</a> page.</p>
+<h2 class="text-headline-sm font-headline-sm text-on-surface pt-md">Questions</h2>
+<p>Email <a class="text-primary hover:underline" href="mailto:{{ admin_contact_email }}">{{ admin_contact_email }}</a> with any questions about your data.</p>
+</main>
+<footer class="mt-auto py-lg px-margin-mobile text-center">
+<p class="text-label-sm font-label-sm text-outline">© 2026 Healio Health Systems.</p>
+</footer>
+</body></html>

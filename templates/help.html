@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Help Center" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+{% set static_page_title = "Help Center" %}
+{% include "_static_page_header.html" %}
+<main class="flex-grow px-margin-mobile py-xl md:max-w-[640px] md:mx-auto w-full space-y-lg">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-xs">I'm a patient</h2>
+<ul class="list-disc pl-lg text-body-md text-on-surface-variant space-y-xs">
+<li>Your Patient Code, Doctor Code, and password were given to you by your doctor at enrollment.</li>
+<li>Use the <strong>Weekly Tracker</strong> to report symptoms once a week, and the daily check-in to log whether you took your medication.</li>
+<li>Lost your login details? Contact your doctor's office directly.</li>
+</ul>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-xs">I'm a doctor</h2>
+<ul class="list-disc pl-lg text-body-md text-on-surface-variant space-y-xs">
+<li>Your Doctor Code and password are issued by the pilot administrator.</li>
+<li>Patients with two missed doses in a row, or two worsening weekly reports in a row, are automatically flagged on your dashboard.</li>
+<li>Lost your login details? Contact the administrator — see <a class="text-primary hover:underline" href="{{ url_for('contact') }}">Contact</a>.</li>
+</ul>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-xs">Still stuck?</h2>
+<p class="text-body-md text-on-surface-variant">Email <a class="text-primary hover:underline" href="mailto:{{ admin_contact_email }}">{{ admin_contact_email }}</a>.</p>
+</div>
+</main>
+<footer class="mt-auto py-lg px-margin-mobile text-center">
+<p class="text-label-sm font-label-sm text-outline">© 2026 Healio Health Systems.</p>
+</footer>
+</body></html>

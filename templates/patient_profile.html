@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | My Profile" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+{% include "_stitch_topbar.html" %}
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-2xl mx-auto">
+<section class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">My Profile</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Your enrollment details on file with Healio.</p>
+</section>
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg flex flex-col gap-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{ patient.name }}</h3>
+<p class="text-on-surface-variant font-body-sm">{{ patient.patient_code }}</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md pt-sm border-t border-outline-variant">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Diagnosis</p>
+<p class="text-on-surface font-body-md">{{ patient.diagnosis or "—" }}</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Medication</p>
+<p class="text-on-surface font-body-md">{{ patient.medication or "—" }}</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Treatment Duration</p>
+<p class="text-on-surface font-body-md">{{ patient.treatment_duration or "—" }}</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Care Provider</p>
+<p class="text-on-surface font-body-md">Dr. {{ patient.doctor_name }} ({{ patient.doctor_code }})</p>
+</div>
+</div>
+</div>
+</main>
+{% include "_stitch_bottomnav.html" %}
+</body></html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | My Profile" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<header class="bg-background fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-margin-mobile border-b border-outline-variant">
+<a class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-95" href="{{ url_for('doctor_dashboard') }}">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</a>
+<h1 class="text-headline-md font-headline-md text-primary ml-2">My Profile</h1>
+</header>
+<main class="pt-24 pb-8 px-margin-mobile max-w-2xl mx-auto">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg flex flex-col gap-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">stethoscope</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. {{ doctor.name }}</h3>
+<p class="text-on-surface-variant font-body-sm">{{ doctor.doctor_code }}</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md pt-sm border-t border-outline-variant">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Patients</p>
+<p class="text-on-surface font-body-md">{{ patient_count }}</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Member Since</p>
+<p class="text-on-surface font-body-md">{{ doctor.created_at }}</p>
+</div>
+</div>
+</div>
+</main>
+{% include "_stitch_doctor_bottomnav.html" %}
+</body></html>

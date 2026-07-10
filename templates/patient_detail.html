@@ -12,9 +12,15 @@
 <h1 class="text-headline-md font-headline-md text-primary">Patient Profile</h1>
 </div>
 <div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary p-2">notifications</span>
-<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/20">
-<img class="w-full h-full object-cover" alt="A professional headshot of a female doctor in a white clinical coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8S3K8d3d4hK7CG7ZonHko8j0tuV0GQyCx69lMxsIAILPIXFCUomTfNIKRYXkzjg49LRkRrOP9-bs9FcmmvB-wRBALn1Fbyc99ZRsVag4kGJp4M2EsYkH4wVy6OIXH2j4AtNbiSjR8J_eKlELUq8VHGwpIJ8w2kbUmn-rD3jQH7_lzjRXnt4lqkYWx_5YiXLx4sg9IiII1LnDhsVykwJvQ9zOfE_Yuvh348hYxI-eqJpwHCvXK4fYBPtIFyM5WTyV1r5coU-KPmFA"/>
+<a class="relative material-symbols-outlined text-primary p-2 rounded-full hover:bg-surface-container transition-colors" href="{{ url_for('doctor_notifications') }}" aria-label="Notifications">
+notifications
+{% if unread_notifications_count %}
+<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-error"></span>
+{% endif %}
+</a>
+<a class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/20 flex items-center justify-center" href="{{ url_for('doctor_profile') }}" title="Your profile">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
+</a>
 </div>
 </div>
 </header>

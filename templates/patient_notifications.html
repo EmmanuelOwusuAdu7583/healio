@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Notifications" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+{% include "_stitch_topbar.html" %}
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<section class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Notifications</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Updates about your appointments and care notes.</p>
+</section>
+{% if notifications %}
+<div class="flex flex-col gap-sm">
+{% for n in notifications %}
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-start gap-sm {{ 'border border-primary/30' if not n.read_at else '' }}" href="{{ n.link or url_for('patient_dashboard') }}">
+<span class="material-symbols-outlined text-primary p-2 bg-primary-fixed rounded-full shrink-0">notifications</span>
+<div class="flex-grow">
+<p class="text-on-surface font-body-sm">{{ n.message }}</p>
+<span class="text-on-surface-variant font-label-sm">{{ n.created_at }}</span>
+</div>
+{% if not n.read_at %}
+<span class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1"></span>
+{% endif %}
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
+<span class="material-symbols-outlined text-3xl">notifications</span>
+<span class="font-label-md text-label-md">No notifications yet.</span>
+</div>
+{% endif %}
+</main>
+{% include "_stitch_bottomnav.html" %}
+</body></html>

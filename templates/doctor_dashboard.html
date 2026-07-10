@@ -10,22 +10,28 @@
 </div>
 <div class="hidden md:flex items-center gap-lg">
 <nav class="flex items-center gap-md">
-<a class="text-primary font-label-md text-label-md bg-primary-container px-4 py-2 rounded-full transition-all duration-150" href="{{ url_for('doctor_dashboard') }}">Home</a>
+<a class="{{ 'text-primary bg-primary-container' if active == 'home' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all duration-150" href="{{ url_for('doctor_dashboard') }}">Home</a>
 <a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_dashboard') }}">Patients</a>
-<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Schedule</a>
+<a class="{{ 'text-primary bg-primary-container' if active == 'schedule' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_schedule') }}">Schedule</a>
 <a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Reports</a>
 </nav>
 </div>
 <div class="flex items-center gap-md">
+<a class="relative material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('doctor_notifications') }}" aria-label="Notifications">
+notifications
+{% if unread_notifications_count %}
+<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-error"></span>
+{% endif %}
+</a>
 <a class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
-<div class="flex items-center gap-sm">
+<a class="flex items-center gap-sm" href="{{ url_for('doctor_profile') }}">
 <span class="hidden md:block text-right">
 <p class="font-label-md text-label-md text-on-surface">Dr. {{ session.doctor_name }}</p>
 </span>
 <div class="w-10 h-10 rounded-full border-2 border-primary-fixed overflow-hidden">
 <img class="w-full h-full object-cover" alt="A professional studio portrait of a friendly male doctor in his late 40s wearing a white clinical coat and a blue stethoscope." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwRMmxRcq-HNyFGcAs6ZhUATxt4kSs0zersOS8NJhCGFyG_z6I4CWmyQ7sNeby6d_9EC-PW3UqUR09s0cUSA-3mqozwzOZcXunfd4DrrBjfHF6BqUrG6sbQpT_6SE6uTwm2w4369zjt_b89-dI58jYwfuFphvm2mHknqKZfW1CimUUlclvE64RV7i6CBqUGd_SIqxcD_0INvX0e61hEvLCxfv0424jMCJwqQy7S00dEkk1nBYplkBNhHkzycpOhqwtyG5jwUwhwBU"/>
 </div>
-</div>
+</a>
 </div>
 </header>
 <main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">

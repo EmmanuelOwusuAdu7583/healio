@@ -6,14 +6,17 @@
 <body class="bg-background text-on-background font-body-lg min-h-screen pb-24">
 <header class="sticky top-0 z-50 bg-background flex justify-between items-center w-full px-margin-mobile h-16">
 <div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
-<img class="w-full h-full object-cover" alt="A professional close-up studio portrait of a mature male doctor in clinical attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAG7wpwxZXzcw3BG2xNe_l3DQq5VQom45aypEXJk2NtGPNeYHiKHU7JQyXTmSgayyFHcRKhsZoZ3DwxZStqGnZIMvrEzBaXsak9Gyo0t4_L8_yteaWKGAlawbfv2-Xv4VcpWv0NBvw5NHL2pTKZtKyh7wcDUlamCgCiqYjekM9rbIeDs67F7y23pAUI5u_vUsZ9-vEyOCzvELllIDXMfPaHY8KMkBnHjuewhkcZub9B5Xha37sb7Xf3YTkh5Xfgp32-Ntl9hl5MzE"/>
-</div>
+<a class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden flex items-center justify-center" href="{{ url_for('patient_profile') }}" title="Your profile">
+<span class="material-symbols-outlined text-primary">person</span>
+</a>
 <h1 class="text-headline-md font-headline-md text-primary">Healio</h1>
 </div>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-95 duration-150">
+<a class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-95 duration-150" href="{{ url_for('patient_notifications') }}" aria-label="Notifications">
 <span class="material-symbols-outlined text-primary">notifications</span>
-</button>
+{% if unread_notifications_count %}
+<span class="absolute top-1 right-2 w-2 h-2 rounded-full bg-error"></span>
+{% endif %}
+</a>
 </header>
 <main class="max-w-2xl mx-auto px-margin-mobile pt-6">
 {% include "_stitch_flash.html" %}

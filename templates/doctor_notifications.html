@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Notifications" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<header class="bg-background fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-margin-mobile border-b border-outline-variant">
+<a class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-95" href="{{ url_for('doctor_dashboard') }}">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</a>
+<h1 class="text-headline-md font-headline-md text-primary ml-2">Notifications</h1>
+</header>
+<main class="pt-24 pb-8 px-margin-mobile max-w-2xl mx-auto">
+{% include "_stitch_flash.html" %}
+{% if notifications %}
+<div class="flex flex-col gap-sm">
+{% for n in notifications %}
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-start gap-sm {{ 'border border-primary/30' if not n.read_at else '' }}" href="{{ n.link or url_for('doctor_dashboard') }}">
+<span class="material-symbols-outlined text-primary p-2 bg-primary-fixed rounded-full shrink-0">notifications</span>
+<div class="flex-grow">
+<p class="text-on-surface font-body-sm">{{ n.message }}</p>
+<span class="text-on-surface-variant font-label-sm">{{ n.created_at }}</span>
+</div>
+{% if not n.read_at %}
+<span class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1"></span>
+{% endif %}
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
+<span class="material-symbols-outlined text-3xl">notifications</span>
+<span class="font-label-md text-label-md">No notifications yet.</span>
+</div>
+{% endif %}
+</main>
+{% include "_stitch_doctor_bottomnav.html" %}
+</body></html>

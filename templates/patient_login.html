@@ -55,10 +55,10 @@
 </div>
 <div class="flex items-center justify-between py-xs mt-base">
 <label class="flex items-center space-x-2 cursor-pointer group">
-<input class="w-5 h-5 border-outline-variant rounded text-primary focus:ring-primary/20" type="checkbox"/>
+<input class="w-5 h-5 border-outline-variant rounded text-primary focus:ring-primary/20" type="checkbox" name="remember_device" value="yes"/>
 <span class="font-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Remember device</span>
 </label>
-<a class="font-label-md text-primary hover:underline transition-all" href="#">Forgot code?</a>
+<button class="font-label-md text-primary hover:underline transition-all" type="button" onclick="openContactModal()">Forgot code?</button>
 </div>
 <div class="pt-base">
 <button class="w-full h-[48px] bg-primary text-white font-label-md rounded-full hover:bg-primary-container active:scale-[0.98] transition-all duration-150 flex items-center justify-center space-x-2 shadow-lg shadow-primary/10" type="submit" id="login-btn">
@@ -71,7 +71,7 @@
 <div class="bg-surface-container-low p-md border-t border-outline-variant text-center">
 <p class="font-body-sm text-on-surface-variant">
 Need an account?
-<a class="font-label-md text-primary hover:text-primary-container" href="#">Contact your clinic</a>
+<button class="font-label-md text-primary hover:text-primary-container" type="button" onclick="openContactModal()">Contact your clinic</button>
 </p>
 <p class="font-body-sm text-on-surface-variant mt-1">
 Are you a doctor? <a class="font-label-md text-primary hover:text-primary-container" href="{{ url_for('doctor_login') }}">Sign in here</a>
@@ -90,6 +90,16 @@ Are you a doctor? <a class="font-label-md text-primary hover:text-primary-contai
 </div>
 </div>
 </main>
+<div class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-lg hidden opacity-0 transition-opacity duration-300" id="contact-modal">
+<div class="bg-surface-container-lowest rounded-xl p-xl max-w-sm w-full text-center shadow-xl">
+<div class="w-16 h-16 rounded-full mx-auto mb-lg flex items-center justify-center bg-primary-container/20">
+<span class="material-symbols-outlined text-4xl text-primary">support_agent</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-xs">Contact your clinic</h3>
+<p class="text-body-lg text-on-surface-variant mb-xl">Your Patient Code, Doctor Code, and password were given to you by your doctor when you were enrolled. If you've lost them, contact your doctor's office directly — they can look up or reissue your login details.</p>
+<button class="w-full py-md bg-primary text-on-primary rounded-xl font-semibold" onclick="closeContactModal()">Got it</button>
+</div>
+</div>
 <footer class="p-md text-center">
 <p class="font-label-sm text-outline">© 2026 Healio Health Systems. All rights reserved.</p>
 </footer>
@@ -119,5 +129,16 @@ Are you a doctor? <a class="font-label-md text-primary hover:text-primary-contai
                 }
             });
         });
+
+        function openContactModal() {
+            const modal = document.getElementById('contact-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+        function closeContactModal() {
+            const modal = document.getElementById('contact-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
     </script>
 </body></html>
