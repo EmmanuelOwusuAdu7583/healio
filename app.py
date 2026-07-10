@@ -177,6 +177,18 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS patient_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            file_size INTEGER,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -189,6 +201,14 @@ def migrate_database():
         columns = {row["name"] for row in cursor.fetchall()}
         if "photo_filename" not in columns:
             cursor.execute(f"ALTER TABLE {table} ADD COLUMN photo_filename TEXT")
+
+    cursor.execute("PRAGMA table_info(appointments)")
+    appointment_columns = {row["name"] for row in cursor.fetchall()}
+    if "status" not in appointment_columns:
+        cursor.execute("ALTER TABLE appointments ADD COLUMN status TEXT DEFAULT 'scheduled'")
+    if "appointment_type" not in appointment_columns:
+        cursor.execute("ALTER TABLE appointments ADD COLUMN appointment_type TEXT")
+
     conn.commit()
     conn.close()
 
@@ -238,6 +258,16 @@ def save_uploaded_document(file_storage, old_filename=None):
     if error == "Unsupported file type.":
         error = "Unsupported file type. Use PNG, JPG, GIF, WEBP, or PDF."
     return filename, error
+
+
+def format_file_size(num_bytes):
+    if not num_bytes:
+        return ""
+    for unit in ("B", "KB", "MB"):
+        if num_bytes < 1024:
+            return f"{num_bytes:.0f} {unit}" if unit == "B" else f"{num_bytes:.1f} {unit}"
+        num_bytes /= 1024
+    return f"{num_bytes:.1f} GB"
 
 
 def login_required_doctor(f):
@@ -593,6 +623,11 @@ def patient_detail(patient_id):
     """, (patient_id,))
     prescriptions = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT * FROM patient_documents WHERE patient_id = ? ORDER BY uploaded_at DESC
+    """, (patient_id,))
+    patient_documents = cursor.fetchall()
+
     conn.close()
 
     adherence_pct = None
@@ -618,6 +653,8 @@ def patient_detail(patient_id):
         appointments=appointments,
         medical_records=medical_records,
         prescriptions=prescriptions,
+        patient_documents=patient_documents,
+        format_file_size=format_file_size,
         adherence_pct=adherence_pct,
         trend_points=trend_points,
         active="patients",
@@ -636,12 +673,13 @@ def new_appointment(patient_id):
         return redirect(url_for("doctor_dashboard"))
 
     appointment_at = request.form.get("appointment_at", "").strip()
+    appointment_type = request.form.get("appointment_type", "").strip()
     notes = request.form.get("notes", "").strip()
     if appointment_at:
         cursor.execute("""
-            INSERT INTO appointments (patient_id, doctor_id, appointment_at, notes)
-            VALUES (?, ?, ?, ?)
-        """, (patient_id, session["doctor_id"], appointment_at, notes))
+            INSERT INTO appointments (patient_id, doctor_id, appointment_at, appointment_type, notes)
+            VALUES (?, ?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], appointment_at, appointment_type, notes))
         conn.commit()
         flash("Appointment scheduled.")
         create_notification(
@@ -790,20 +828,132 @@ def doctor_profile_photo():
     return redirect(url_for("doctor_profile"))
 
 
-@app.route("/doctor/schedule")
+@app.route("/doctor/appointments/new", methods=["POST"])
 @login_required_doctor
-def doctor_schedule():
+def new_appointment_any_patient():
+    patient_id = request.form.get("patient_id", "")
+    appointment_at = request.form.get("appointment_at", "").strip()
+    appointment_type = request.form.get("appointment_type", "").strip()
+    notes = request.form.get("notes", "").strip()
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM patients WHERE id = ? AND doctor_id = ?", (patient_id, session["doctor_id"]))
+    patient = cursor.fetchone()
+    if not patient:
+        conn.close()
+        flash("Select a valid patient.")
+        return redirect(url_for("doctor_schedule"))
+
+    if appointment_at:
+        cursor.execute("""
+            INSERT INTO appointments (patient_id, doctor_id, appointment_at, appointment_type, notes)
+            VALUES (?, ?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], appointment_at, appointment_type, notes))
+        conn.commit()
+        flash("Appointment scheduled.")
+        create_notification(
+            "patient", patient_id,
+            f"New appointment scheduled for {appointment_at}",
+            url_for("patient_checkin"),
+        )
+
+    conn.close()
+    return redirect(url_for("doctor_schedule"))
+
+
+@app.route("/doctor/appointments/<int:appointment_id>/status", methods=["POST"])
+@login_required_doctor
+def update_appointment_status(appointment_id):
+    new_status = request.form.get("status", "")
+    if new_status not in ("completed", "cancelled"):
+        return redirect(url_for("doctor_schedule"))
+
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.*, p.name as patient_name FROM appointments a
+        SELECT a.patient_id FROM appointments a
         JOIN patients p ON a.patient_id = p.id
-        WHERE a.doctor_id = ?
-        ORDER BY a.appointment_at ASC
-    """, (session["doctor_id"],))
-    appointments = cursor.fetchall()
+        WHERE a.id = ? AND p.doctor_id = ?
+    """, (appointment_id, session["doctor_id"]))
+    appt = cursor.fetchone()
+    if appt:
+        cursor.execute("UPDATE appointments SET status = ? WHERE id = ?", (new_status, appointment_id))
+        conn.commit()
+        flash(f"Appointment marked {new_status}.")
+        if new_status == "cancelled":
+            create_notification(
+                "patient", appt["patient_id"],
+                "Your doctor cancelled an upcoming appointment",
+                url_for("patient_checkin"),
+            )
     conn.close()
-    return render_template("doctor_schedule.html", appointments=appointments, active="schedule")
+
+    view = request.form.get("view", "week")
+    day = request.form.get("day", "")
+    return redirect(url_for("doctor_schedule", view=view, day=day) if day else url_for("doctor_schedule", view=view))
+
+
+@app.route("/doctor/schedule")
+@login_required_doctor
+def doctor_schedule():
+    view = request.args.get("view", "week")
+    if view not in ("today", "week", "month"):
+        view = "week"
+    day = request.args.get("day", "")
+
+    today = date.today()
+    monday = today - timedelta(days=today.weekday())
+    week_days = [monday + timedelta(days=i) for i in range(7)]
+
+    if view == "today":
+        range_start, range_end = today, today + timedelta(days=1)
+    elif view == "month":
+        range_start = today.replace(day=1)
+        range_end = date(today.year + 1, 1, 1) if today.month == 12 else date(today.year, today.month + 1, 1)
+    else:
+        selected_day = None
+        if day:
+            try:
+                candidate = date.fromisoformat(day)
+                if monday <= candidate <= monday + timedelta(days=6):
+                    selected_day = candidate
+            except ValueError:
+                pass
+        if selected_day:
+            range_start, range_end = selected_day, selected_day + timedelta(days=1)
+        else:
+            range_start, range_end = monday, monday + timedelta(days=7)
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT a.*, p.name as patient_name, p.photo_filename as patient_photo,
+        (SELECT COUNT(*) FROM flags f WHERE f.patient_id = p.id AND f.resolved = 0) as patient_active_flags
+        FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        WHERE a.doctor_id = ? AND a.appointment_at >= ? AND a.appointment_at < ?
+        ORDER BY a.appointment_at ASC
+    """, (session["doctor_id"], range_start.isoformat(), range_end.isoformat()))
+    appointments = cursor.fetchall()
+
+    cursor.execute("SELECT id, name FROM patients WHERE doctor_id = ? ORDER BY name", (session["doctor_id"],))
+    patients = cursor.fetchall()
+    cursor.execute("SELECT COUNT(*) as c FROM patients WHERE doctor_id = ?", (session["doctor_id"],))
+    total_patients = cursor.fetchone()["c"]
+    conn.close()
+
+    return render_template(
+        "doctor_schedule.html",
+        appointments=appointments,
+        patients=patients,
+        total_patients=total_patients,
+        view=view,
+        selected_day=day,
+        week_days=week_days,
+        today=today,
+        active="schedule",
+    )
 
 
 @app.route("/doctor/reports")
@@ -1164,8 +1314,14 @@ def patient_profile():
         WHERE p.id = ?
     """, (session["patient_id"],))
     patient = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM patient_documents WHERE patient_id = ? ORDER BY uploaded_at DESC
+    """, (session["patient_id"],))
+    documents = cursor.fetchall()
+
     conn.close()
-    return render_template("patient_profile.html", patient=patient)
+    return render_template("patient_profile.html", patient=patient, documents=documents, format_file_size=format_file_size)
 
 
 @app.route("/patient/profile/photo", methods=["POST"])
@@ -1182,6 +1338,52 @@ def patient_profile_photo():
         conn.close()
         session["patient_photo"] = filename
         flash("Profile photo updated.")
+    return redirect(url_for("patient_profile"))
+
+
+@app.route("/patient/documents/new", methods=["POST"])
+@login_required_patient
+def new_patient_document():
+    file_storage = request.files.get("document")
+    if not file_storage or not file_storage.filename:
+        flash("No file selected.")
+        return redirect(url_for("patient_profile"))
+
+    original_name = secure_filename(file_storage.filename)
+    filename, error = save_uploaded_document(file_storage)
+    if error:
+        flash(error)
+        return redirect(url_for("patient_profile"))
+
+    file_size = os.path.getsize(os.path.join(UPLOAD_FOLDER, filename))
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO patient_documents (patient_id, filename, original_name, file_size)
+        VALUES (?, ?, ?, ?)
+    """, (session["patient_id"], filename, original_name, file_size))
+    conn.commit()
+    conn.close()
+    flash("Document uploaded.")
+    return redirect(url_for("patient_profile"))
+
+
+@app.route("/patient/documents/<int:document_id>/delete", methods=["POST"])
+@login_required_patient
+def delete_patient_document(document_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM patient_documents WHERE id = ? AND patient_id = ?", (document_id, session["patient_id"]))
+    document = cursor.fetchone()
+    if document:
+        file_path = os.path.join(UPLOAD_FOLDER, document["filename"])
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        cursor.execute("DELETE FROM patient_documents WHERE id = ?", (document_id,))
+        conn.commit()
+        flash("Document removed.")
+    conn.close()
     return redirect(url_for("patient_profile"))
 
 

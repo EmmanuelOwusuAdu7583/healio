@@ -13,23 +13,29 @@
 <main class="pt-24 pb-8 px-margin-mobile max-w-2xl mx-auto">
 {% include "_stitch_flash.html" %}
 <div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg flex flex-col gap-md">
-<div class="flex items-center gap-md">
-<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
+<div class="flex items-center gap-lg">
+<div class="relative shrink-0">
+<div class="w-24 h-24 rounded-full bg-surface-container-highest border-2 border-surface-container-highest overflow-hidden flex items-center justify-center">
 {% if doctor.photo_filename %}
 <img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + doctor.photo_filename) }}" alt="{{ doctor.name }}'s profile photo"/>
 {% else %}
-<span class="material-symbols-outlined text-on-surface-variant text-3xl">stethoscope</span>
+<span class="material-symbols-outlined text-on-surface-variant text-4xl">stethoscope</span>
 {% endif %}
 </div>
-<div>
+<label class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white cursor-pointer" for="doctor-photo-input">
+<span class="material-symbols-outlined text-sm" style="font-size: 16px;">edit</span>
+</label>
+</div>
+<div class="flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface">{{ doctor.name }}</h3>
-<p class="text-on-surface-variant font-body-sm">{{ doctor.doctor_code }}</p>
-</div>
-</div>
-<form class="flex items-center gap-sm pt-sm border-t border-outline-variant" method="POST" action="{{ url_for('doctor_profile_photo') }}" enctype="multipart/form-data">
-<input class="text-body-sm font-body-sm text-on-surface-variant flex-grow" type="file" name="photo" accept="image/png,image/jpeg,image/gif,image/webp" required/>
-<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md shrink-0" type="submit">Upload Photo</button>
+<p class="text-on-surface-variant font-body-sm mb-1">{{ doctor.doctor_code }}</p>
+<p class="text-label-sm text-on-surface-variant mb-sm">JPG, GIF, PNG, or WEBP. Max size 5MB.</p>
+<form method="POST" action="{{ url_for('doctor_profile_photo') }}" enctype="multipart/form-data">
+<input class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" id="doctor-photo-input" name="photo" onchange="this.form.submit()" type="file"/>
+<label class="inline-block bg-primary text-on-primary px-lg py-2 rounded-lg text-label-md font-label-md cursor-pointer hover:opacity-90 transition-opacity" for="doctor-photo-input">Upload New</label>
 </form>
+</div>
+</div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md pt-sm border-t border-outline-variant">
 <div>
 <p class="text-label-sm font-label-sm text-outline uppercase">Patients</p>

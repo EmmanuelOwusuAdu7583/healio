@@ -12,23 +12,29 @@
 </section>
 {% include "_stitch_flash.html" %}
 <div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg flex flex-col gap-md">
-<div class="flex items-center gap-md">
-<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
+<div class="flex items-center gap-lg">
+<div class="relative shrink-0">
+<div class="w-24 h-24 rounded-full bg-surface-container-highest border-2 border-surface-container-highest overflow-hidden flex items-center justify-center">
 {% if patient.photo_filename %}
 <img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + patient.photo_filename) }}" alt="{{ patient.name }}'s profile photo"/>
 {% else %}
-<span class="material-symbols-outlined text-on-surface-variant text-3xl">person</span>
+<span class="material-symbols-outlined text-on-surface-variant text-4xl">person</span>
 {% endif %}
 </div>
-<div>
+<label class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white cursor-pointer" for="patient-photo-input">
+<span class="material-symbols-outlined text-sm" style="font-size: 16px;">edit</span>
+</label>
+</div>
+<div class="flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface">{{ patient.name }}</h3>
-<p class="text-on-surface-variant font-body-sm">{{ patient.patient_code }}</p>
-</div>
-</div>
-<form class="flex items-center gap-sm pt-sm border-t border-outline-variant" method="POST" action="{{ url_for('patient_profile_photo') }}" enctype="multipart/form-data">
-<input class="text-body-sm font-body-sm text-on-surface-variant flex-grow" type="file" name="photo" accept="image/png,image/jpeg,image/gif,image/webp" required/>
-<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md shrink-0" type="submit">Upload Photo</button>
+<p class="text-on-surface-variant font-body-sm mb-1">{{ patient.patient_code }}</p>
+<p class="text-label-sm text-on-surface-variant mb-sm">JPG, GIF, PNG, or WEBP. Max size 5MB.</p>
+<form method="POST" action="{{ url_for('patient_profile_photo') }}" enctype="multipart/form-data">
+<input class="hidden" accept="image/png,image/jpeg,image/gif,image/webp" id="patient-photo-input" name="photo" onchange="this.form.submit()" type="file"/>
+<label class="inline-block bg-primary text-on-primary px-lg py-2 rounded-lg text-label-md font-label-md cursor-pointer hover:opacity-90 transition-opacity" for="patient-photo-input">Upload New</label>
 </form>
+</div>
+</div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md pt-sm border-t border-outline-variant">
 <div>
 <p class="text-label-sm font-label-sm text-outline uppercase">Diagnosis</p>
@@ -46,6 +52,54 @@
 <p class="text-label-sm font-label-sm text-outline uppercase">Care Provider</p>
 <p class="text-on-surface font-body-md">{{ patient.doctor_name }} ({{ patient.doctor_code }})</p>
 </div>
+</div>
+</div>
+
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg mt-lg">
+<h3 class="text-label-md font-label-md text-on-surface-variant mb-md tracking-wider uppercase">My Documents</h3>
+<form action="{{ url_for('new_patient_document') }}" enctype="multipart/form-data" method="POST">
+<label class="w-full py-xl px-md flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer rounded-xl border-2 border-dashed border-outline-variant mb-lg" for="document-input">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary">cloud_upload</span>
+</div>
+<p class="text-body-lg font-semibold text-on-surface text-center">Tap to upload a document</p>
+<p class="text-body-sm text-on-surface-variant text-center mt-1">PDF, JPG, PNG, GIF, or WEBP · Max 5MB</p>
+<input class="hidden" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf" id="document-input" name="document" onchange="this.form.submit()" type="file"/>
+</label>
+</form>
+{% if documents %}
+<h4 class="text-label-md font-label-md text-on-surface-variant mb-sm">Recent Uploads</h4>
+<div class="space-y-sm">
+{% for doc in documents %}
+<div class="flex items-center gap-md p-sm bg-surface rounded-lg border border-outline-variant/30">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">{{ "image" if doc.original_name.lower().rsplit(".", 1)[-1] in ["png", "jpg", "jpeg", "gif", "webp"] else "description" }}</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-body-sm font-medium text-on-surface truncate">{{ doc.original_name }}</p>
+<p class="text-label-sm text-on-surface-variant">{{ format_file_size(doc.file_size) }} · {{ doc.uploaded_at }}</p>
+</div>
+<a class="w-8 h-8 flex items-center justify-center rounded-full text-primary hover:bg-primary-container/20 transition-colors" download href="{{ url_for('static', filename='uploads/' + doc.filename) }}">
+<span class="material-symbols-outlined text-lg">download</span>
+</a>
+<form method="POST" action="{{ url_for('delete_patient_document', document_id=doc.id) }}">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-error hover:bg-error-container transition-colors" type="submit">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</form>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p class="text-body-sm text-on-surface-variant text-center">No documents uploaded yet.</p>
+{% endif %}
+</div>
+
+<div class="p-lg bg-tertiary-fixed text-on-tertiary-fixed rounded-xl flex gap-md items-start mt-lg">
+<span class="material-symbols-outlined">info</span>
+<div>
+<p class="text-label-md font-bold">Privacy note</p>
+<p class="text-body-sm mt-1 opacity-90">Documents you upload here are visible to you and your assigned doctor only.</p>
 </div>
 </div>
 </main>
