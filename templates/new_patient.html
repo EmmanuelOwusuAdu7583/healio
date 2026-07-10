@@ -9,13 +9,16 @@
 <span class="material-symbols-outlined text-primary" data-icon="person_add">person_add</span>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">Add Patient</h1>
 </div>
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-3">
 <a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full" data-icon="arrow_back" href="{{ url_for('doctor_dashboard') }}" aria-label="Back to dashboard">arrow_back</a>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/20 shrink-0">
+<img class="w-full h-full object-cover" alt="A professional headshot of a female doctor in a white clinical coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8S3K8d3d4hK7CG7ZonHko8j0tuV0GQyCx69lMxsIAILPIXFCUomTfNIKRYXkzjg49LRkRrOP9-bs9FcmmvB-wRBALn1Fbyc99ZRsVag4kGJp4M2EsYkH4wVy6OIXH2j4AtNbiSjR8J_eKlELUq8VHGwpIJ8w2kbUmn-rD3jQH7_lzjRXnt4lqkYWx_5YiXLx4sg9IiII1LnDhsVykwJvQ9zOfE_Yuvh348hYxI-eqJpwHCvXK4fYBPtIFyM5WTyV1r5coU-KPmFA"/>
+</div>
 </div>
 </header>
 <main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-xl mx-auto">
 {% include "_stitch_flash.html" %}
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg">
 <h2 class="font-headline-md text-headline-md text-primary mb-1">Patient Information</h2>
 <p class="text-on-surface-variant font-body-sm mb-md">Please provide the patient's medical information</p>
 <form class="space-y-sm" method="POST">
@@ -35,7 +38,7 @@
 <label class="block font-label-md text-on-surface-variant mb-1" for="treatment_duration">Treatment Duration</label>
 <input class="w-full h-[48px] bg-surface-container-low border border-outline-variant rounded-lg px-sm font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="treatment_duration" name="treatment_duration" placeholder="e.g. 3 months" type="text"/>
 </div>
-<button class="w-full h-[48px] bg-primary text-white font-label-md rounded-lg hover:bg-primary-container active:scale-[0.98] transition-all duration-150 mt-sm" type="submit">Save &amp; Generate Patient Code</button>
+<button class="w-full h-[48px] bg-primary text-white font-label-md rounded-full hover:bg-primary-container active:scale-[0.98] transition-all duration-150 mt-sm" type="submit">Save &amp; Generate Patient Code</button>
 </form>
 </div>
 </main>

@@ -23,7 +23,7 @@
 {% if reports %}
 <div class="space-y-gutter" id="report-list">
 {% for report in reports %}
-<div class="bento-card report-item bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm" data-trend="{{ report.symptom_trend }}" data-search="{{ (report.symptoms or '')|lower }} {{ (report.side_effects or '')|lower }} week {{ report.week_number }}">
+<div class="bento-card report-item bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex flex-col gap-sm" data-trend="{{ report.symptom_trend }}" data-search="{{ (report.symptoms or '')|lower }} {{ (report.side_effects or '')|lower }} week {{ report.week_number }}">
 <div class="flex items-center justify-between">
 <h3 class="font-label-md text-label-md text-on-surface">Week {{ report.week_number }}</h3>
 <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full {% if report.symptom_trend == 'worse' %}bg-error-container text-error{% elif report.symptom_trend == 'better' %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">{{ report.symptom_trend|capitalize }}</span>
@@ -39,7 +39,7 @@
 <div class="empty-state bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant" id="no-results" style="display:none;">No entries match your search or filter.</div>
 {% else %}
 <div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant">No entries yet. Submit your first weekly report to start tracking your progress.</div>
-<a class="inline-block mt-sm bg-primary text-white font-label-md text-label-md px-md py-2 rounded-lg hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('weekly_tracker') }}">Submit Weekly Report</a>
+<a class="inline-block mt-sm bg-primary text-white font-label-md text-label-md px-md py-2 rounded-full hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('weekly_tracker') }}">Submit Weekly Report</a>
 {% endif %}
 </main>
 {% include "_stitch_bottomnav.html" %}

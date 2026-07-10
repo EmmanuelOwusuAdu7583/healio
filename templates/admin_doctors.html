@@ -15,17 +15,17 @@
 </header>
 <main class="pt-16 pb-16 px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto">
 {% include "_stitch_flash.html" %}
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md mb-gutter">
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md mb-gutter">
 <h3 class="font-label-md text-label-md text-on-surface mb-sm">Add a new doctor</h3>
 <form class="flex gap-sm items-end flex-wrap" method="POST">
 <div class="flex-1 min-w-[220px]">
 <label class="block font-label-md text-on-surface-variant mb-1" for="name">Doctor Name</label>
 <input class="w-full h-[44px] bg-surface-container-low border border-outline-variant rounded-lg px-sm font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="name" name="name" placeholder="e.g. Dr. Sarah Johnson" required type="text"/>
 </div>
-<button class="h-[44px] bg-primary text-white font-label-md text-label-md px-md rounded-lg hover:bg-on-primary-fixed-variant transition-all" type="submit">Add Doctor</button>
+<button class="h-[44px] bg-primary text-white font-label-md text-label-md px-md rounded-full hover:bg-on-primary-fixed-variant transition-all" type="submit">Add Doctor</button>
 </form>
 </section>
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md">
 <h3 class="font-label-md text-label-md text-on-surface mb-sm">Existing doctors ({{ doctors|length }})</h3>
 {% if doctors %}
 <div class="overflow-x-auto">

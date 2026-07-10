@@ -13,7 +13,7 @@
 {% include "_stitch_flash.html" %}
 <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
 <div class="md:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-gutter">
-<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4" href="{{ url_for('patient_checkin') }}">
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4" href="{{ url_for('patient_checkin') }}">
 <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-primary text-3xl" data-icon="pill">pill</span>
 </div>
@@ -26,7 +26,7 @@
 {% endif %}
 </div>
 </a>
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-secondary-container/10 flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-secondary text-3xl" data-icon="clinical_notes">clinical_notes</span>
 </div>
@@ -35,7 +35,7 @@
 <p class="font-label-md text-label-md text-on-surface">{{ patient.medication or "No medication on file" }}</p>
 </div>
 </div>
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-tertiary-container/10 flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-tertiary text-3xl" data-icon="star">star</span>
 </div>
@@ -50,7 +50,7 @@
 </div>
 </div>
 <div class="md:col-span-8 space-y-gutter">
-<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between group" href="{{ url_for('weekly_tracker') }}">
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center justify-between group" href="{{ url_for('weekly_tracker') }}">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary text-3xl" data-icon="fact_check">fact_check</span>
@@ -62,7 +62,7 @@
 </div>
 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
 </a>
-<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between group" href="{{ url_for('patient_history') }}">
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center justify-between group" href="{{ url_for('patient_history') }}">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-secondary-container/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary text-3xl" data-icon="history">history</span>
@@ -74,7 +74,7 @@
 </div>
 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
 </a>
-<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between group" href="{{ url_for('patient_notes') }}">
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center justify-between group" href="{{ url_for('patient_notes') }}">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-tertiary-container/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-tertiary text-3xl" data-icon="description">description</span>
@@ -87,8 +87,15 @@
 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
 </a>
 </div>
-<div class="md:col-span-4">
-<div class="bg-surface-container-low rounded-xl p-md border border-outline-variant h-full">
+<div class="md:col-span-4 space-y-gutter">
+<div class="h-48 rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" alt="A clean, minimalist close-up of a modern stethoscope and a sleek tablet displaying medical graphs in a bright, airy clinical office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAkwYoPVStPOeZK-hscWXfDOlnfmVvW9FGgdwQnzcO55HPesFbABXMiJiqPvieTApbVeTNe6qb9hq6Zvh8_eiNzJVLz23sh-S4crxnPs_6xEpOhrdJfb6_q3IO4jgjAsMLNIWiH8aAkiwDAuD_aaiShvwJb-JKA0ZOsm4l4twxXRCauoI_1RKzQfMICHOnCw5BdF1DT70kscFifqidrmZJoFrcshNFWOWGaLTp-9-ckrd5Nvh_mUhXMYirY-IZs0gdTrG-DBOmD4s"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<span class="bg-primary px-2 py-1 rounded text-[10px] text-white font-bold uppercase tracking-wider">Patient Portal</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md border border-outline-variant">
 <h3 class="font-label-md text-label-md text-on-surface mb-xs">Recent notes from your doctor</h3>
 {% if recent_notes %}
 <div class="space-y-sm mt-sm">

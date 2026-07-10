@@ -13,7 +13,7 @@
 {% if notes %}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
 {% for note in notes %}
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex flex-col gap-sm">
 <div class="flex items-center justify-between">
 <h3 class="font-label-md text-label-md text-on-surface">{{ note.doctor_name }}</h3>
 <span class="text-on-surface-variant font-body-sm">{{ note.created_at }}</span>

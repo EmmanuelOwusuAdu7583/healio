@@ -6,7 +6,9 @@
 <body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
 <header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-14">
 <div class="flex items-center gap-2">
-<span class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-label-md text-label-md">{{ session.doctor_name[0]|upper }}</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/20 shrink-0">
+<img class="w-full h-full object-cover" alt="A professional headshot of a female doctor in a white clinical coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8S3K8d3d4hK7CG7ZonHko8j0tuV0GQyCx69lMxsIAILPIXFCUomTfNIKRYXkzjg49LRkRrOP9-bs9FcmmvB-wRBALn1Fbyc99ZRsVag4kGJp4M2EsYkH4wVy6OIXH2j4AtNbiSjR8J_eKlELUq8VHGwpIJ8w2kbUmn-rD3jQH7_lzjRXnt4lqkYWx_5YiXLx4sg9IiII1LnDhsVykwJvQ9zOfE_Yuvh348hYxI-eqJpwHCvXK4fYBPtIFyM5WTyV1r5coU-KPmFA"/>
+</div>
 <div>
 <p class="text-label-sm text-on-surface-variant leading-none">{{ greeting }}</p>
 <h1 class="font-headline-md text-headline-md font-bold text-primary leading-tight">Dr. {{ session.doctor_name.split(' ')[-1] }}</h1>
@@ -19,7 +21,7 @@
 <main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-5xl mx-auto">
 {% include "_stitch_flash.html" %}
 <div class="grid grid-cols-2 gap-gutter mb-gutter">
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-primary text-3xl" data-icon="groups">groups</span>
 </div>
@@ -28,7 +30,7 @@
 <p class="text-on-surface-variant font-body-sm">Total Patients</p>
 </div>
 </div>
-<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-error text-3xl" data-icon="flag">flag</span>
 </div>
@@ -42,16 +44,18 @@
 <span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
 <input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="patient-search" placeholder="Search patient name, ID, or diagnosis" type="text"/>
 </div>
-<a class="inline-flex items-center gap-1 bg-primary text-white font-label-md text-label-md px-md py-2 rounded-lg hover:bg-on-primary-fixed-variant transition-all mb-gutter" href="{{ url_for('new_patient') }}">
+<a class="inline-flex items-center gap-1 bg-primary text-white font-label-md text-label-md px-md py-2 rounded-full hover:bg-on-primary-fixed-variant transition-all mb-gutter" href="{{ url_for('new_patient') }}">
 <span class="material-symbols-outlined text-[18px]">person_add</span> Add New Patient
 </a>
 <h3 class="font-label-md text-label-md text-on-surface mb-sm">Patient Watchlist</h3>
 {% if patients %}
 <div class="space-y-sm" id="patient-list">
 {% for patient in patients %}
-<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between patient-list-item" data-search="{{ patient.name|lower }} {{ patient.patient_code|lower }} {{ (patient.diagnosis or '')|lower }}" href="{{ url_for('patient_detail', patient_id=patient.id) }}">
+<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center justify-between patient-list-item" data-search="{{ patient.name|lower }} {{ patient.patient_code|lower }} {{ (patient.diagnosis or '')|lower }}" href="{{ url_for('patient_detail', patient_id=patient.id) }}">
 <div class="flex items-center gap-3">
-<span class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-md text-label-md shrink-0">{{ patient.name[0]|upper }}</span>
+<span class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0" title="No photo uploaded yet">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</span>
 <div>
 <p class="font-label-md text-label-md text-on-surface">{{ patient.name }}</p>
 <p class="text-on-surface-variant font-body-sm">{{ patient.patient_code }} · {{ patient.diagnosis or "No diagnosis on file" }}</p>

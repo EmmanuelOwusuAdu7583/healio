@@ -1,7 +1,7 @@
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     {% for message in messages %}
-    <div class="bg-error-container text-error text-body-sm rounded-lg px-sm py-2 mb-sm">{{ message }}</div>
+    <div class="bg-error-container text-error text-body-sm font-body-sm rounded-xl px-sm py-2 mb-sm">{{ message }}</div>
     {% endfor %}
   {% endif %}
 {% endwith %}

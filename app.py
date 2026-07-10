@@ -13,6 +13,13 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "healio-fallback-admin-for-loc
 DB_PATH = "healio.db"
 
 
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+
 # ---------- Database ----------
 
 def get_db():
@@ -362,6 +369,19 @@ def patient_detail(patient_id):
 
     conn.close()
 
+    adherence_pct = None
+    if daily_checkins:
+        taken = sum(1 for c in daily_checkins if c["took_medication"])
+        adherence_pct = round(100 * taken / len(daily_checkins))
+
+    trend_points = []
+    reports_asc = list(reversed(weekly_reports))
+    rated_reports = [r for r in reports_asc if r["satisfaction_rating"]]
+    for i, r in enumerate(rated_reports):
+        x = 0 if len(rated_reports) == 1 else round(i * 800 / (len(rated_reports) - 1))
+        y = round(180 - (r["satisfaction_rating"] - 1) / 4 * 160)
+        trend_points.append({"x": x, "y": y, "week": r["week_number"], "rating": r["satisfaction_rating"]})
+
     return render_template(
         "patient_detail.html",
         patient=patient,
@@ -369,6 +389,8 @@ def patient_detail(patient_id):
         daily_checkins=daily_checkins,
         notes=notes,
         active_flags=active_flags,
+        adherence_pct=adherence_pct,
+        trend_points=trend_points,
         active="patients",
     )
 

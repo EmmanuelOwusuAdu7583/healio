@@ -1,18 +1,18 @@
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-2 px-4 bg-surface border-t border-outline-variant z-50 rounded-t-xl shadow-md">
-<a class="flex flex-col items-center justify-center {{ 'text-primary font-semibold' if active == 'home' else 'text-on-surface-variant' }} hover:bg-surface-container-low min-h-[44px] min-w-[44px] transition-all" href="{{ url_for('patient_dashboard') }}">
-<span class="material-symbols-outlined" data-icon="home"{% if active == 'home' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>home</span>
-<span class="font-label-sm text-label-sm">Home</span>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container-lowest shadow-md rounded-t-xl">
+<a class="flex flex-col items-center justify-center {{ 'text-primary bg-primary-container rounded-full px-4 py-1' if active == 'home' else 'text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full' }} transition-all" href="{{ url_for('patient_dashboard') }}">
+<span class="material-symbols-outlined"{% if active == 'home' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>home</span>
+<span class="text-label-sm font-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center {{ 'text-primary font-semibold' if active == 'checkin' else 'text-on-surface-variant' }} hover:bg-surface-container-low min-h-[44px] min-w-[44px] transition-all" href="{{ url_for('weekly_tracker') }}">
-<span class="material-symbols-outlined" data-icon="fact_check"{% if active == 'checkin' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>fact_check</span>
-<span class="font-label-sm text-label-sm">Check-in</span>
+<a class="flex flex-col items-center justify-center {{ 'text-primary bg-primary-container rounded-full px-4 py-1' if active == 'checkin' else 'text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full' }} transition-all" href="{{ url_for('weekly_tracker') }}">
+<span class="material-symbols-outlined"{% if active == 'checkin' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>fact_check</span>
+<span class="text-label-sm font-label-sm">Check-in</span>
 </a>
-<a class="flex flex-col items-center justify-center {{ 'text-primary font-semibold' if active == 'history' else 'text-on-surface-variant' }} hover:bg-surface-container-low min-h-[44px] min-w-[44px] transition-all" href="{{ url_for('patient_history') }}">
-<span class="material-symbols-outlined" data-icon="history"{% if active == 'history' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>history</span>
-<span class="font-label-sm text-label-sm">History</span>
+<a class="flex flex-col items-center justify-center {{ 'text-primary bg-primary-container rounded-full px-4 py-1' if active == 'history' else 'text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full' }} transition-all" href="{{ url_for('patient_history') }}">
+<span class="material-symbols-outlined"{% if active == 'history' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>history</span>
+<span class="text-label-sm font-label-sm">History</span>
 </a>
-<a class="flex flex-col items-center justify-center {{ 'text-primary font-semibold' if active == 'notes' else 'text-on-surface-variant' }} hover:bg-surface-container-low min-h-[44px] min-w-[44px] transition-all" href="{{ url_for('patient_notes') }}">
-<span class="material-symbols-outlined" data-icon="description"{% if active == 'notes' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>description</span>
-<span class="font-label-sm text-label-sm">Notes</span>
+<a class="flex flex-col items-center justify-center {{ 'text-primary bg-primary-container rounded-full px-4 py-1' if active == 'notes' else 'text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full' }} transition-all" href="{{ url_for('patient_notes') }}">
+<span class="material-symbols-outlined"{% if active == 'notes' %} style="font-variation-settings: 'FILL' 1;"{% endif %}>description</span>
+<span class="text-label-sm font-label-sm">Notes</span>
 </a>
 </nav>
