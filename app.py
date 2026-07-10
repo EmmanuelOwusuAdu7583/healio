@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, date, timedelta
 from functools import wraps
 from werkzeug.utils import secure_filename
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "healio-fallback-key-for-local-dev-only")
@@ -396,6 +396,14 @@ def inject_notifications():
 @app.route("/")
 def index():
     return render_template("welcome.html")
+
+
+@app.route("/service-worker.js")
+def service_worker():
+    # Served from the root path (not /static/) so its default scope covers
+    # the whole origin, not just /static/ — required for it to control
+    # actual page navigations, not only static asset requests.
+    return send_from_directory(app.static_folder, "service-worker.js")
 
 
 @app.route("/logout")
