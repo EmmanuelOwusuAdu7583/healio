@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | Check-in History" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+{% include "_stitch_topbar.html" %}
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<section class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Check-in History</h2>
+<p class="text-on-surface-variant font-body-md mt-1">A record of your past weekly submissions.</p>
+</section>
+<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+<input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="history-search" placeholder="Search logs or symptoms" type="text"/>
+</div>
+<div class="flex gap-2 mb-lg flex-wrap">
+<button class="filter-pill active px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm bg-primary text-white" data-filter="all">All Logs</button>
+<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="better">Better</button>
+<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="worse">Worse</button>
+<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="same">Neutral</button>
+</div>
+{% if reports %}
+<div class="space-y-gutter" id="report-list">
+{% for report in reports %}
+<div class="bento-card report-item bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm" data-trend="{{ report.symptom_trend }}" data-search="{{ (report.symptoms or '')|lower }} {{ (report.side_effects or '')|lower }} week {{ report.week_number }}">
+<div class="flex items-center justify-between">
+<h3 class="font-label-md text-label-md text-on-surface">Week {{ report.week_number }}</h3>
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full {% if report.symptom_trend == 'worse' %}bg-error-container text-error{% elif report.symptom_trend == 'better' %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">{{ report.symptom_trend|capitalize }}</span>
+</div>
+{% if report.symptoms %}<p class="text-on-surface-variant font-body-sm">Symptoms: {{ report.symptoms }}</p>{% endif %}
+<div class="flex items-center gap-4 text-on-surface-variant font-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base" data-icon="calendar_today">calendar_today</span> {{ report.created_at }}</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base star-active" data-icon="star">star</span> {{ report.satisfaction_rating }} / 5</span>
+</div>
+</div>
+{% endfor %}
+</div>
+<div class="empty-state bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant" id="no-results" style="display:none;">No entries match your search or filter.</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant">No entries yet. Submit your first weekly report to start tracking your progress.</div>
+<a class="inline-block mt-sm bg-primary text-white font-label-md text-label-md px-md py-2 rounded-lg hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('weekly_tracker') }}">Submit Weekly Report</a>
+{% endif %}
+</main>
+{% include "_stitch_bottomnav.html" %}
+<script>
+        const searchInput = document.getElementById('history-search');
+        const filterPills = document.querySelectorAll('.filter-pill');
+        let activeFilter = 'all';
+
+        function applyFilters() {
+            const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            const items = document.querySelectorAll('.report-item');
+            let visibleCount = 0;
+            items.forEach(item => {
+                const matchesSearch = item.getAttribute('data-search').includes(query);
+                const matchesFilter = activeFilter === 'all' || item.getAttribute('data-trend') === activeFilter;
+                const show = matchesSearch && matchesFilter;
+                item.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            const noResults = document.getElementById('no-results');
+            if (noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', function () {
+                filterPills.forEach(p => {
+                    p.classList.remove('active', 'bg-primary', 'text-white');
+                    p.classList.add('text-on-surface-variant');
+                });
+                this.classList.add('active', 'bg-primary', 'text-white');
+                this.classList.remove('text-on-surface-variant');
+                activeFilter = this.getAttribute('data-filter');
+                applyFilters();
+            });
+        });
+    </script>
+</body></html>

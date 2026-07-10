@@ -1,0 +1,220 @@
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{ page_title|default('Healio') }}</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d6",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-tertiary-container": "#ffc6b2",
+                        "tertiary": "#7b2600",
+                        "inverse-on-surface": "#e9f1ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#b8140b",
+                        "secondary-fixed-dim": "#ffb4a8",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#a33500",
+                        "inverse-surface": "#213244",
+                        "surface-variant": "#d3e4fc",
+                        "surface-container-low": "#eef4ff",
+                        "primary-fixed": "#dae2ff",
+                        "surface-container-high": "#dbe9ff",
+                        "on-secondary-fixed": "#410000",
+                        "on-surface-variant": "#434654",
+                        "outline": "#737685",
+                        "on-background": "#0b1d2e",
+                        "surface-tint": "#0c56d0",
+                        "on-surface": "#0b1d2e",
+                        "secondary-container": "#dc3223",
+                        "secondary-fixed": "#ffdad4",
+                        "surface-container": "#e5efff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#380d00",
+                        "surface": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "surface-dim": "#cbdbf4",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "surface-container-highest": "#d3e4fc",
+                        "primary-container": "#0052cc",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-secondary-container": "#fffbff",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-primary": "#b2c5ff",
+                        "primary": "#003d9b",
+                        "on-secondary-fixed-variant": "#930001",
+                        "on-primary-fixed": "#001848",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "lg": "32px",
+                        "margin-mobile": "16px",
+                        "sm": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "body-sm": ["Manrope"],
+                        "headline-lg-mobile": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .star-active {
+            font-variation-settings: 'FILL' 1;
+            color: #0052cc;
+        }
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        input:checked + .toggle-dot {
+            transform: translateX(100%);
+            background-color: #ffffff;
+        }
+        input:checked + .toggle-bg {
+            background-color: #0052cc;
+        }
+        .clinical-gradient {
+            background: linear-gradient(135deg, #0052cc 0%, #003d9b 100%);
+        }
+        .soft-elevation {
+            box-shadow: 0 4px 20px -2px rgba(0, 61, 155, 0.05);
+        }
+        .login-card-backdrop {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .input-focus-ring:focus-within {
+            border-color: #0052cc;
+            box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+        }
+        /* Star rating: radio inputs in DOM order 5..1, row-reverse displays 1..5
+           left-to-right while the ~ combinator still fills toward the left. */
+        .hstar-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+        .hstar-rating input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .hstar-rating label {
+            font-family: 'Material Symbols Outlined';
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 30px;
+            line-height: 1;
+            cursor: pointer;
+            color: #737685;
+            transition: transform 0.15s, color 0.15s;
+        }
+        .hstar-rating label:active {
+            transform: scale(0.9);
+        }
+        .hstar-rating label::before {
+            content: 'star';
+        }
+        .hstar-rating input:checked ~ label,
+        .hstar-rating label:hover,
+        .hstar-rating label:hover ~ label {
+            color: #0052cc;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Medication adherence toggle */
+        .htoggle-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .htoggle-switch input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .htoggle-bg {
+            width: 44px;
+            height: 24px;
+            background: #c3c6d6;
+            border-radius: 9999px;
+            transition: background-color 0.15s;
+        }
+        .htoggle-switch input:checked + .htoggle-bg {
+            background-color: #0052cc;
+        }
+        .htoggle-dot {
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border: 1px solid #c3c6d6;
+            border-radius: 9999px;
+            transition: transform 0.15s;
+        }
+        .htoggle-switch input:checked ~ .htoggle-dot {
+            transform: translateX(100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>

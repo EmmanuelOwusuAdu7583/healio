@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio | My Notes" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+{% include "_stitch_topbar.html" %}
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<section class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">My Notes</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Notes and guidance from your doctor.</p>
+</section>
+{% if notes %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+{% for note in notes %}
+<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-label-md text-label-md text-on-surface">{{ note.doctor_name }}</h3>
+<span class="text-on-surface-variant font-body-sm">{{ note.created_at }}</span>
+</div>
+<p class="text-on-surface-variant font-body-sm">{{ note.note_text }}</p>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
+<span class="material-symbols-outlined text-3xl" data-icon="description">description</span>
+<span class="font-label-md text-label-md">No notes yet from your doctor.</span>
+</div>
+{% endif %}
+</main>
+{% include "_stitch_bottomnav.html" %}
+</body></html>

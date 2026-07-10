@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Daily Check-in — Healio" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+{% include "_stitch_topbar.html" %}
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-2xl mx-auto">
+{% include "_stitch_flash.html" %}
+<section class="mb-md">
+<div class="flex justify-between items-baseline">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wide">Daily Adherence</p>
+<p class="text-label-md font-label-md text-primary">{{ taken_count }}/7</p>
+</div>
+<p class="font-label-md text-label-md text-on-surface mt-1">Weekly Progress</p>
+<div class="w-full h-2 bg-surface-container-low rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: {{ (taken_count/7*100)|round|int }}%;"></div>
+</div>
+</section>
+
+<div class="flex justify-between gap-1 mb-lg">
+{% for d in week_days %}
+<div class="flex flex-col items-center gap-1 {{ 'font-bold' if d.is_today }}">
+<span class="text-label-sm text-on-surface-variant">{{ d.letter }}</span>
+<span class="w-8 h-8 rounded-full flex items-center justify-center text-label-sm font-label-md {% if d.status == 'yes' %}bg-primary-container/10 text-primary{% elif d.status == 'no' %}bg-error-container text-error{% else %}bg-surface-container-low text-on-surface-variant{% endif %} {{ 'ring-2 ring-primary' if d.is_today }}">{{ d.num }}</span>
+</div>
+{% endfor %}
+</div>
+
+<div class="flex flex-col items-center text-center mb-lg">
+<div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="pill">pill</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Did you take your medication today?</h2>
+<p class="text-on-surface-variant font-body-sm mt-1">Consistency is key to your recovery plan. Please log your morning dose.</p>
+</div>
+
+<form method="POST">
+<div class="grid grid-cols-2 gap-sm mb-md">
+<label class="bento-card border-2 border-outline-variant rounded-xl p-md flex flex-col items-center gap-2 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
+<input checked="" class="sr-only" name="took_medication" type="radio" value="yes"/>
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="check_circle">check_circle</span>
+<span class="font-label-md text-label-md text-on-surface">Yes</span>
+</label>
+<label class="bento-card border-2 border-outline-variant rounded-xl p-md flex flex-col items-center gap-2 cursor-pointer has-[:checked]:border-error has-[:checked]:bg-error-container/40">
+<input class="sr-only" name="took_medication" type="radio" value="no"/>
+<span class="material-symbols-outlined text-error text-3xl" data-icon="cancel">cancel</span>
+<span class="font-label-md text-label-md text-on-surface">No</span>
+</label>
+</div>
+<button class="w-full bg-primary text-white font-label-md text-label-md py-4 rounded-lg shadow-sm hover:bg-on-primary-fixed-variant active:scale-95 transition-all" type="submit">Save</button>
+</form>
+</main>
+{% include "_stitch_bottomnav.html" %}
+</body></html>

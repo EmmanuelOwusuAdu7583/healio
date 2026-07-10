@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Dashboard — Healio" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-14">
+<div class="flex items-center gap-2">
+<span class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-label-md text-label-md">{{ session.doctor_name[0]|upper }}</span>
+<div>
+<p class="text-label-sm text-on-surface-variant leading-none">{{ greeting }}</p>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-tight">Dr. {{ session.doctor_name.split(' ')[-1] }}</h1>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full" data-icon="logout" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
+</div>
+</header>
+<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-5xl mx-auto">
+{% include "_stitch_flash.html" %}
+<div class="grid grid-cols-2 gap-gutter mb-gutter">
+<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="groups">groups</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">{{ total_patients }}</p>
+<p class="text-on-surface-variant font-body-sm">Total Patients</p>
+</div>
+</div>
+<div class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error text-3xl" data-icon="flag">flag</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">{{ flagged_count }}</p>
+<p class="text-on-surface-variant font-body-sm">Flagged Patients</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+<input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="patient-search" placeholder="Search patient name, ID, or diagnosis" type="text"/>
+</div>
+<a class="inline-flex items-center gap-1 bg-primary text-white font-label-md text-label-md px-md py-2 rounded-lg hover:bg-on-primary-fixed-variant transition-all mb-gutter" href="{{ url_for('new_patient') }}">
+<span class="material-symbols-outlined text-[18px]">person_add</span> Add New Patient
+</a>
+<h3 class="font-label-md text-label-md text-on-surface mb-sm">Patient Watchlist</h3>
+{% if patients %}
+<div class="space-y-sm" id="patient-list">
+{% for patient in patients %}
+<a class="bento-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between patient-list-item" data-search="{{ patient.name|lower }} {{ patient.patient_code|lower }} {{ (patient.diagnosis or '')|lower }}" href="{{ url_for('patient_detail', patient_id=patient.id) }}">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-md text-label-md shrink-0">{{ patient.name[0]|upper }}</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">{{ patient.name }}</p>
+<p class="text-on-surface-variant font-body-sm">{{ patient.patient_code }} · {{ patient.diagnosis or "No diagnosis on file" }}</p>
+</div>
+</div>
+{% if patient.active_flags > 0 %}
+<span class="bg-error-container text-error text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">{{ patient.active_flags }} flag{{ 's' if patient.active_flags > 1 }}</span>
+{% else %}
+<span class="bg-primary-container/10 text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">Stable</span>
+{% endif %}
+</a>
+{% endfor %}
+</div>
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant mt-sm" id="no-results" style="display:none;">No patients match your search.</div>
+{% else %}
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
+<span class="material-symbols-outlined text-3xl" data-icon="groups">groups</span>
+<span class="font-label-md text-label-md">No patients yet. Add your first patient to get started.</span>
+</div>
+{% endif %}
+</main>
+<a class="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg z-50 hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('new_patient') }}" aria-label="Add new patient">
+<span class="material-symbols-outlined text-3xl">person_add</span>
+</a>
+{% include "_stitch_doctor_bottomnav.html" %}
+<script>
+        const searchInput = document.getElementById('patient-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase().trim();
+                const items = document.querySelectorAll('.patient-list-item');
+                let visibleCount = 0;
+                items.forEach(item => {
+                    const match = item.getAttribute('data-search').includes(query);
+                    item.style.display = match ? '' : 'none';
+                    if (match) visibleCount++;
+                });
+                const noResults = document.getElementById('no-results');
+                if (noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+            });
+        }
+    </script>
+</body></html>

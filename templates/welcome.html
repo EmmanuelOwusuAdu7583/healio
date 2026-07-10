@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+{% set page_title = "Healio — Your partner in recovery and health monitoring" %}
+{% include "_stitch_head.html" %}
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop relative overflow-hidden">
+<div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-surface-container-high/30 rounded-full blur-3xl"></div>
+<div class="w-full max-w-[440px] z-10">
+<div class="flex flex-col items-center mb-lg text-center">
+<div class="w-16 h-16 clinical-gradient rounded-xl flex items-center justify-center mb-sm soft-elevation">
+<span class="material-symbols-outlined text-white text-[32px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Healio</h1>
+<p class="text-on-surface-variant font-body-sm mt-1">Your partner in recovery and health monitoring</p>
+</div>
+
+<div class="space-y-sm">
+<a class="bento-card login-card-backdrop border border-outline-variant rounded-xl p-md flex items-center gap-4 soft-elevation" href="{{ url_for('patient_login') }}">
+<span class="w-11 h-11 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">person</span>
+</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">I am a Patient</p>
+<p class="text-on-surface-variant font-body-sm">Track recovery milestones and communicate with your care team</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</a>
+<a class="bento-card login-card-backdrop border border-outline-variant rounded-xl p-md flex items-center gap-4 soft-elevation" href="{{ url_for('doctor_login') }}">
+<span class="w-11 h-11 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">badge</span>
+</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">I am a Doctor</p>
+<p class="text-on-surface-variant font-body-sm">Monitor patient progress and provide real-time clinical guidance</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</a>
+</div>
+
+<div class="pt-lg">
+<a class="w-full h-[48px] bg-primary text-white font-label-md rounded-lg hover:bg-primary-container active:scale-[0.98] transition-all duration-150 flex items-center justify-center" href="{{ url_for('patient_login') }}">Get Started</a>
+<p class="text-center font-body-sm text-on-surface-variant mt-sm">Already have an account? <a class="font-label-md text-primary hover:underline" href="{{ url_for('patient_login') }}">Log In</a></p>
+</div>
+
+<div class="grid grid-cols-2 gap-2 mt-lg">
+<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">lock</span> HIPAA Secure</div>
+<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">sync</span> Live Sync</div>
+<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">diversity_3</span> Collaborative</div>
+<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">insights</span> Insight Driven</div>
+</div>
+</div>
+</main>
+<footer class="p-md text-center">
+<p class="font-label-sm text-outline">© 2026 Healio Health Systems. All rights reserved.</p>
+</footer>
+</body></html>
