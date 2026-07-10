@@ -1,58 +1,115 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Healio — Your partner in recovery and health monitoring" %}
+{% set page_title = "Healio | Empowering Care, Simplified" %}
 {% include "_stitch_head.html" %}
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
-<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop relative overflow-hidden">
-<div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-3xl"></div>
-<div class="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-surface-container-high/30 rounded-full blur-3xl"></div>
-<div class="w-full max-w-[440px] z-10">
-<div class="flex flex-col items-center mb-lg text-center">
-<div class="w-16 h-16 clinical-gradient rounded-xl flex items-center justify-center mb-sm soft-elevation">
-<span class="material-symbols-outlined text-white text-[32px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<header class="bg-background flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 fixed top-0 z-50 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<span class="text-headline-md font-headline-md text-primary">Healio</span>
 </div>
-<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Healio</h1>
-<p class="text-on-surface-variant font-body-sm mt-1">Your partner in recovery and health monitoring</p>
+<div class="flex items-center gap-4">
+<button class="hover:bg-surface-container p-2 rounded-full transition-all duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" alt="A professional medical profile avatar of a healthcare provider wearing a clean white lab coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR-ukOX6QQl_Pha5f0fdEmZgwOi-ncprra5ucfmnjsQX22Hn84djGBWI5Xzq2QB_CH2sjCRIn-Lfs00k2E-xIAafduQkCssxzq1SAFquFT2QqDI1h9qbFyAc1QNT3uWZs_7fWH4rjYcPB3a0gy70FlZALwjiEyygrGRiQjJzrJtvqpUe2kLc7mg7NqHThO_aqpjEZXOgs4da2QXr2pxPI8HfGUV7Ahg2FLta4BmlPXFgMcFD1GpjRioADMf0LOS6rKAp6U3952XBw"/>
 </div>
-
-<div class="space-y-sm">
-<a class="bento-card login-card-backdrop border border-outline-variant rounded-xl p-md flex items-center gap-4 soft-elevation" href="{{ url_for('patient_login') }}">
-<span class="w-11 h-11 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">person</span>
-</span>
-<div class="flex-1">
-<p class="font-label-md text-label-md text-on-surface">I am a Patient</p>
-<p class="text-on-surface-variant font-body-sm">Track recovery milestones and communicate with your care team</p>
 </div>
-<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center pt-24 pb-16 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+<img alt="" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZdLs4cceqUTQ1KPYKD3MPFU0HIgmuhdGbYB5tH354csbLRWpCP_EGxN_-HYQ_qoG0nk8DQU3KObUoXFU3GKx4CZzOrmxGiCX1bmAMTS7i2l5rBX_iPQH9pLakKU4hYPrDvgtAKCafWRdvT5szLLwu9sOMxfYRyesK_GdewEx-51ABrpGqw2qu3rto5HiKo2AU-s_GRL5HaccnM7rDmNAJyH0Kj9ZHl0gYNwzbkd5OcfQvkf4uAXwVik0dTLZf9RALa0JwnNt05vI"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-background"></div>
+</div>
+<div class="max-w-4xl w-full text-center z-10 flex flex-col items-center relative">
+<div class="mb-8 p-6 bg-white rounded-full shadow-lg inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-6xl" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
+</div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-background mb-4 tracking-tight">
+Empowering Care, Simplified
+</h1>
+<p class="text-body-lg text-on-surface-variant max-w-2xl mb-12">
+The next-generation healthcare platform bridging the gap between doctors and patients through intelligent data and human-centric design.
+</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg w-full max-w-2xl">
+<a class="group flex flex-col items-center p-xl bg-white rounded-[24px] shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-transparent hover:border-primary transition-all duration-300 hover:shadow-[0px_8px_30px_rgba(0,0,0,0.08)]" href="{{ url_for('doctor_login') }}">
+<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white text-3xl">stethoscope</span>
+</div>
+<span class="text-headline-md font-headline-md text-on-background mb-2">I am a Doctor</span>
+<span class="text-label-md font-label-md text-on-surface-variant text-center">Manage practice, patients, and schedule with clinical precision.</span>
+<div class="mt-lg px-6 py-3 bg-primary text-white rounded-full font-semibold transition-all group-hover:px-8">
+Enter Practice
+</div>
 </a>
-<a class="bento-card login-card-backdrop border border-outline-variant rounded-xl p-md flex items-center gap-4 soft-elevation" href="{{ url_for('doctor_login') }}">
-<span class="w-11 h-11 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">badge</span>
-</span>
-<div class="flex-1">
-<p class="font-label-md text-label-md text-on-surface">I am a Doctor</p>
-<p class="text-on-surface-variant font-body-sm">Monitor patient progress and provide real-time clinical guidance</p>
+<a class="group flex flex-col items-center p-xl bg-white rounded-[24px] shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-transparent hover:border-secondary transition-all duration-300 hover:shadow-[0px_8px_30px_rgba(0,0,0,0.08)]" href="{{ url_for('patient_login') }}">
+<div class="w-16 h-16 bg-secondary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined text-secondary group-hover:text-white text-3xl">person</span>
 </div>
-<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+<span class="text-headline-md font-headline-md text-on-background mb-2">I am a Patient</span>
+<span class="text-label-md font-label-md text-on-surface-variant text-center">Access records, book appointments, and track your health journey.</span>
+<div class="mt-lg px-6 py-3 bg-secondary text-white rounded-full font-semibold transition-all group-hover:px-8">
+Access Health
+</div>
 </a>
 </div>
-
-<div class="pt-lg">
-<a class="w-full h-[48px] bg-primary text-white font-label-md rounded-full hover:bg-primary-container active:scale-[0.98] transition-all duration-150 flex items-center justify-center" href="{{ url_for('patient_login') }}">Get Started</a>
-<p class="text-center font-body-sm text-on-surface-variant mt-sm">Already have an account? <a class="font-label-md text-primary hover:underline" href="{{ url_for('patient_login') }}">Log In</a></p>
 </div>
-
-<div class="grid grid-cols-2 gap-2 mt-lg">
-<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">lock</span> HIPAA Secure</div>
-<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">sync</span> Live Sync</div>
-<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">diversity_3</span> Collaborative</div>
-<div class="flex items-center justify-center gap-1 bg-surface-container-low border border-outline-variant rounded-lg py-2 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">insights</span> Insight Driven</div>
+<div class="mt-24 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
+<span class="material-symbols-outlined text-primary text-3xl">security</span>
+<div>
+<h3 class="font-headline-md text-on-surface">Data Privacy</h3>
+<p class="text-body-sm text-on-surface-variant">HIPAA-compliant end-to-end encryption for all medical records.</p>
+</div>
+</div>
+<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
+<span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+<div>
+<h3 class="font-headline-md text-on-surface">Instant Access</h3>
+<p class="text-body-sm text-on-surface-variant">Real-time collaboration between care teams and patients.</p>
+</div>
+</div>
+<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
+<span class="material-symbols-outlined text-primary text-3xl">analytics</span>
+<div>
+<h3 class="font-headline-md text-on-surface">Smart Insights</h3>
+<p class="text-body-sm text-on-surface-variant">Predictive analytics to help identify health trends early.</p>
+</div>
 </div>
 </div>
 </main>
-<footer class="p-md text-center">
-<p class="font-label-sm text-outline">© 2026 Healio Health Systems. All rights reserved.</p>
+<footer class="bg-surface-container-lowest py-12 px-margin-mobile md:px-margin-desktop mt-auto border-t border-outline-variant">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<span class="font-bold text-primary">Healio</span>
+</div>
+<nav class="flex gap-lg flex-wrap justify-center">
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Help Center</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+</nav>
+<div class="text-label-sm font-label-sm text-outline">
+© 2026 Healio Health Systems. All rights reserved.
+</div>
+</div>
 </footer>
+<div class="fixed inset-0 pointer-events-none z-[100] opacity-0 transition-opacity duration-300 bg-[radial-gradient(circle_400px_at_var(--x)_var(--y),rgba(0,61,155,0.05),transparent)]" id="mouse-glow"></div>
+<script>
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouse-glow');
+            glow.style.setProperty('--x', `${e.clientX}px`);
+            glow.style.setProperty('--y', `${e.clientY}px`);
+            glow.style.opacity = '1';
+        });
+
+        document.querySelectorAll('a.group, button').forEach(el => {
+            el.addEventListener('mousedown', () => { el.style.transform = 'scale(0.96)'; });
+            el.addEventListener('mouseup', () => { el.style.transform = ''; });
+            el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+        });
+    </script>
 </body></html>
