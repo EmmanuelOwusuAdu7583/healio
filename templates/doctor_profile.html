@@ -11,16 +11,25 @@
 <h1 class="text-headline-md font-headline-md text-primary ml-2">My Profile</h1>
 </header>
 <main class="pt-24 pb-8 px-margin-mobile max-w-2xl mx-auto">
+{% include "_stitch_flash.html" %}
 <div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg flex flex-col gap-md">
 <div class="flex items-center gap-md">
-<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
+{% if doctor.photo_filename %}
+<img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + doctor.photo_filename) }}" alt="{{ doctor.name }}'s profile photo"/>
+{% else %}
 <span class="material-symbols-outlined text-on-surface-variant text-3xl">stethoscope</span>
+{% endif %}
 </div>
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Dr. {{ doctor.name }}</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface">{{ doctor.name }}</h3>
 <p class="text-on-surface-variant font-body-sm">{{ doctor.doctor_code }}</p>
 </div>
 </div>
+<form class="flex items-center gap-sm pt-sm border-t border-outline-variant" method="POST" action="{{ url_for('doctor_profile_photo') }}" enctype="multipart/form-data">
+<input class="text-body-sm font-body-sm text-on-surface-variant flex-grow" type="file" name="photo" accept="image/png,image/jpeg,image/gif,image/webp" required/>
+<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md shrink-0" type="submit">Upload Photo</button>
+</form>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md pt-sm border-t border-outline-variant">
 <div>
 <p class="text-label-sm font-label-sm text-outline uppercase">Patients</p>

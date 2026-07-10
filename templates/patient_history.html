@@ -7,7 +7,11 @@
 <header class="sticky top-0 z-50 bg-background flex justify-between items-center w-full px-margin-mobile h-16">
 <div class="flex items-center gap-3">
 <a class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden flex items-center justify-center" href="{{ url_for('patient_profile') }}" title="Your profile">
+{% if session.patient_photo %}
+<img class="w-full h-full object-cover" src="{{ url_for('static', filename='uploads/' + session.patient_photo) }}" alt="{{ session.patient_name }}'s profile photo"/>
+{% else %}
 <span class="material-symbols-outlined text-primary">person</span>
+{% endif %}
 </a>
 <h1 class="text-headline-md font-headline-md text-primary">Healio</h1>
 </div>

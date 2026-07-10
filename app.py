@@ -2,8 +2,10 @@ import os
 import sqlite3
 import secrets
 import string
+import uuid
 from datetime import datetime, date, timedelta
 from functools import wraps
+from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
@@ -11,8 +13,12 @@ app.secret_key = os.environ.get("SECRET_KEY", "healio-fallback-key-for-local-dev
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "healio-fallback-admin-for-local-dev-only")
 ADMIN_CONTACT_EMAIL = os.environ.get("ADMIN_CONTACT_EMAIL", "admin@healio.local")
 app.permanent_session_lifetime = timedelta(days=30)
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
 DB_PATH = "healio.db"
+UPLOAD_FOLDER = os.path.join("static", "uploads")
+ALLOWED_PHOTO_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+ALLOWED_DOCUMENT_EXTENSIONS = ALLOWED_PHOTO_EXTENSIONS | {"pdf"}
 
 
 @app.after_request
@@ -20,6 +26,12 @@ def add_no_cache_headers(response):
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     return response
+
+
+@app.errorhandler(413)
+def handle_file_too_large(e):
+    flash("That file is too large (max 5MB).")
+    return redirect(request.referrer or url_for("index"))
 
 
 # ---------- Database ----------
@@ -133,6 +145,50 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS medical_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            record_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            summary TEXT,
+            record_date DATE,
+            file_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS prescriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            medication_name TEXT NOT NULL,
+            dosage TEXT,
+            instructions TEXT,
+            prescribed_date DATE,
+            file_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+def migrate_database():
+    conn = get_db()
+    cursor = conn.cursor()
+    for table in ("doctors", "patients"):
+        cursor.execute(f"PRAGMA table_info({table})")
+        columns = {row["name"] for row in cursor.fetchall()}
+        if "photo_filename" not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN photo_filename TEXT")
     conn.commit()
     conn.close()
 
@@ -147,6 +203,41 @@ def generate_code(prefix, length=6):
 def generate_password(length=10):
     chars = string.ascii_letters + string.digits
     return "".join(secrets.choice(chars) for _ in range(length))
+
+
+def save_uploaded_file(file_storage, allowed_extensions, old_filename=None):
+    """Validates and saves an uploaded file, returning its stored filename or None."""
+    if not file_storage or not file_storage.filename:
+        return None, "No file selected."
+
+    ext = file_storage.filename.rsplit(".", 1)[-1].lower() if "." in file_storage.filename else ""
+    if ext not in allowed_extensions:
+        return None, "Unsupported file type."
+
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    safe_name = secure_filename(filename)
+    file_storage.save(os.path.join(UPLOAD_FOLDER, safe_name))
+
+    if old_filename:
+        old_path = os.path.join(UPLOAD_FOLDER, old_filename)
+        if os.path.exists(old_path):
+            os.remove(old_path)
+
+    return safe_name, None
+
+
+def save_uploaded_photo(file_storage, old_filename=None):
+    filename, error = save_uploaded_file(file_storage, ALLOWED_PHOTO_EXTENSIONS, old_filename)
+    if error == "Unsupported file type.":
+        error = "Unsupported file type. Use PNG, JPG, GIF, or WEBP."
+    return filename, error
+
+
+def save_uploaded_document(file_storage, old_filename=None):
+    filename, error = save_uploaded_file(file_storage, ALLOWED_DOCUMENT_EXTENSIONS, old_filename)
+    if error == "Unsupported file type.":
+        error = "Unsupported file type. Use PNG, JPG, GIF, WEBP, or PDF."
+    return filename, error
 
 
 def login_required_doctor(f):
@@ -336,6 +427,7 @@ def doctor_login():
         if doctor and doctor["password"] == password:
             session["doctor_id"] = doctor["id"]
             session["doctor_name"] = doctor["name"]
+            session["doctor_photo"] = doctor["photo_filename"]
             return redirect(url_for("doctor_dashboard"))
         flash("Invalid doctor code or password.")
     return render_template("doctor_login.html")
@@ -348,7 +440,7 @@ def doctor_dashboard():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT p.id, p.patient_code, p.name, p.diagnosis,
+        SELECT p.id, p.patient_code, p.name, p.diagnosis, p.photo_filename,
         (SELECT COUNT(*) FROM flags f WHERE f.patient_id = p.id AND f.resolved = 0) as active_flags
         FROM patients p WHERE p.doctor_id = ?
         ORDER BY active_flags DESC, p.created_at DESC
@@ -393,6 +485,22 @@ def doctor_dashboard():
         active="home",
         greeting=greeting,
     )
+
+
+@app.route("/doctor/patients")
+@login_required_doctor
+def doctor_patients():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.id, p.patient_code, p.name, p.diagnosis, p.photo_filename,
+        (SELECT COUNT(*) FROM flags f WHERE f.patient_id = p.id AND f.resolved = 0) as active_flags
+        FROM patients p WHERE p.doctor_id = ?
+        ORDER BY active_flags DESC, p.created_at DESC
+    """, (session["doctor_id"],))
+    patients = cursor.fetchall()
+    conn.close()
+    return render_template("doctor_patients.html", patients=patients, active="patients")
 
 
 @app.route("/doctor/patients/new", methods=["GET", "POST"])
@@ -444,7 +552,7 @@ def patient_detail(patient_id):
             conn.commit()
             create_notification(
                 "patient", patient_id,
-                f"Dr. {session['doctor_name']} added a new note to your file",
+                f"{session['doctor_name']} added a new note to your file",
                 url_for("patient_notes"),
             )
 
@@ -475,6 +583,16 @@ def patient_detail(patient_id):
     """, (patient_id,))
     appointments = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT * FROM medical_records WHERE patient_id = ? ORDER BY created_at DESC
+    """, (patient_id,))
+    medical_records = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT * FROM prescriptions WHERE patient_id = ? ORDER BY created_at DESC
+    """, (patient_id,))
+    prescriptions = cursor.fetchall()
+
     conn.close()
 
     adherence_pct = None
@@ -498,6 +616,8 @@ def patient_detail(patient_id):
         notes=notes,
         active_flags=active_flags,
         appointments=appointments,
+        medical_records=medical_records,
+        prescriptions=prescriptions,
         adherence_pct=adherence_pct,
         trend_points=trend_points,
         active="patients",
@@ -528,6 +648,78 @@ def new_appointment(patient_id):
             "patient", patient_id,
             f"New appointment scheduled for {appointment_at}",
             url_for("patient_checkin"),
+        )
+
+    conn.close()
+    return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
+@app.route("/doctor/patients/<int:patient_id>/records/new", methods=["POST"])
+@login_required_doctor
+def new_medical_record(patient_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM patients WHERE id = ? AND doctor_id = ?", (patient_id, session["doctor_id"]))
+    patient = cursor.fetchone()
+    if not patient:
+        conn.close()
+        return redirect(url_for("doctor_dashboard"))
+
+    record_type = request.form.get("record_type", "lab")
+    title = request.form.get("title", "").strip()
+    summary = request.form.get("summary", "").strip()
+    record_date = request.form.get("record_date", "").strip()
+
+    if title:
+        filename, error = save_uploaded_document(request.files.get("file"))
+        if error and request.files.get("file") and request.files.get("file").filename:
+            flash(error)
+        cursor.execute("""
+            INSERT INTO medical_records (patient_id, doctor_id, record_type, title, summary, record_date, file_filename)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], record_type, title, summary, record_date, filename))
+        conn.commit()
+        flash("Medical record added.")
+        create_notification(
+            "patient", patient_id,
+            f"{session['doctor_name']} added a new {'scan' if record_type == 'scan' else 'lab result'}: {title}",
+            url_for("patient_reports"),
+        )
+
+    conn.close()
+    return redirect(url_for("patient_detail", patient_id=patient_id))
+
+
+@app.route("/doctor/patients/<int:patient_id>/prescriptions/new", methods=["POST"])
+@login_required_doctor
+def new_prescription(patient_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM patients WHERE id = ? AND doctor_id = ?", (patient_id, session["doctor_id"]))
+    patient = cursor.fetchone()
+    if not patient:
+        conn.close()
+        return redirect(url_for("doctor_dashboard"))
+
+    medication_name = request.form.get("medication_name", "").strip()
+    dosage = request.form.get("dosage", "").strip()
+    instructions = request.form.get("instructions", "").strip()
+    prescribed_date = request.form.get("prescribed_date", "").strip()
+
+    if medication_name:
+        filename, error = save_uploaded_document(request.files.get("file"))
+        if error and request.files.get("file") and request.files.get("file").filename:
+            flash(error)
+        cursor.execute("""
+            INSERT INTO prescriptions (patient_id, doctor_id, medication_name, dosage, instructions, prescribed_date, file_filename)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], medication_name, dosage, instructions, prescribed_date, filename))
+        conn.commit()
+        flash("Prescription added.")
+        create_notification(
+            "patient", patient_id,
+            f"{session['doctor_name']} added a new prescription: {medication_name}",
+            url_for("patient_reports"),
         )
 
     conn.close()
@@ -581,6 +773,23 @@ def doctor_profile():
     return render_template("doctor_profile.html", doctor=doctor, patient_count=patient_count)
 
 
+@app.route("/doctor/profile/photo", methods=["POST"])
+@login_required_doctor
+def doctor_profile_photo():
+    filename, error = save_uploaded_photo(request.files.get("photo"), session.get("doctor_photo"))
+    if error:
+        flash(error)
+    else:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE doctors SET photo_filename = ? WHERE id = ?", (filename, session["doctor_id"]))
+        conn.commit()
+        conn.close()
+        session["doctor_photo"] = filename
+        flash("Profile photo updated.")
+    return redirect(url_for("doctor_profile"))
+
+
 @app.route("/doctor/schedule")
 @login_required_doctor
 def doctor_schedule():
@@ -595,6 +804,65 @@ def doctor_schedule():
     appointments = cursor.fetchall()
     conn.close()
     return render_template("doctor_schedule.html", appointments=appointments, active="schedule")
+
+
+@app.route("/doctor/reports")
+@login_required_doctor
+def doctor_reports():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, name, patient_code FROM patients WHERE doctor_id = ? ORDER BY name", (session["doctor_id"],))
+    patient_rows = cursor.fetchall()
+
+    patient_reports = []
+    total_active_flags = 0
+    total_resolved_flags = 0
+    for p in patient_rows:
+        cursor.execute("""
+            SELECT took_medication FROM daily_checkins WHERE patient_id = ? ORDER BY check_date DESC LIMIT 14
+        """, (p["id"],))
+        checkins = cursor.fetchall()
+        adherence_pct = None
+        if checkins:
+            taken = sum(1 for c in checkins if c["took_medication"])
+            adherence_pct = round(100 * taken / len(checkins))
+
+        cursor.execute("""
+            SELECT satisfaction_rating FROM weekly_reports
+            WHERE patient_id = ? AND satisfaction_rating IS NOT NULL
+            ORDER BY week_number DESC LIMIT 1
+        """, (p["id"],))
+        latest_rating_row = cursor.fetchone()
+        latest_rating = latest_rating_row["satisfaction_rating"] if latest_rating_row else None
+
+        cursor.execute("SELECT COUNT(*) as c FROM flags WHERE patient_id = ? AND resolved = 0", (p["id"],))
+        active_flags = cursor.fetchone()["c"]
+        cursor.execute("SELECT COUNT(*) as c FROM flags WHERE patient_id = ? AND resolved = 1", (p["id"],))
+        resolved_flags = cursor.fetchone()["c"]
+
+        total_active_flags += active_flags
+        total_resolved_flags += resolved_flags
+
+        patient_reports.append({
+            "id": p["id"],
+            "name": p["name"],
+            "patient_code": p["patient_code"],
+            "adherence_pct": adherence_pct,
+            "latest_rating": latest_rating,
+            "active_flags": active_flags,
+        })
+
+    conn.close()
+
+    return render_template(
+        "doctor_reports.html",
+        patient_reports=patient_reports,
+        total_patients=len(patient_rows),
+        total_active_flags=total_active_flags,
+        total_resolved_flags=total_resolved_flags,
+        active="reports",
+    )
 
 
 # ---------- Patient ----------
@@ -620,6 +888,7 @@ def patient_login():
             session.permanent = request.form.get("remember_device") == "yes"
             session["patient_id"] = patient["id"]
             session["patient_name"] = patient["name"]
+            session["patient_photo"] = patient["photo_filename"]
             return redirect(url_for("patient_dashboard"))
         flash("Invalid patient code, doctor code, or password.")
     return render_template("patient_login.html")
@@ -817,6 +1086,61 @@ def patient_notes():
     return render_template("patient_notes.html", notes=notes, active="notes")
 
 
+@app.route("/patient/reports")
+@login_required_patient
+def patient_reports():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT mr.*, d.name as doctor_name FROM medical_records mr
+        JOIN doctors d ON mr.doctor_id = d.id
+        WHERE mr.patient_id = ? ORDER BY mr.created_at DESC
+    """, (session["patient_id"],))
+    medical_records = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT p.*, d.name as doctor_name FROM prescriptions p
+        JOIN doctors d ON p.doctor_id = d.id
+        WHERE p.patient_id = ? ORDER BY p.created_at DESC
+    """, (session["patient_id"],))
+    prescriptions = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT dn.*, d.name as doctor_name FROM doctor_notes dn
+        JOIN doctors d ON dn.doctor_id = d.id
+        WHERE dn.patient_id = ? ORDER BY dn.created_at DESC
+    """, (session["patient_id"],))
+    notes = cursor.fetchall()
+
+    conn.close()
+    return render_template(
+        "patient_reports.html",
+        medical_records=medical_records,
+        prescriptions=prescriptions,
+        notes=notes,
+        active="reports",
+    )
+
+
+@app.route("/patient/reports/request", methods=["POST"])
+@login_required_patient
+def request_new_report():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT doctor_id, name FROM patients WHERE id = ?", (session["patient_id"],))
+    patient = cursor.fetchone()
+    conn.close()
+
+    create_notification(
+        "doctor", patient["doctor_id"],
+        f"{patient['name']} requested a new report",
+        url_for("patient_detail", patient_id=session["patient_id"]),
+    )
+    flash("Your doctor has been notified.")
+    return redirect(url_for("patient_reports"))
+
+
 @app.route("/patient/notifications")
 @login_required_patient
 def patient_notifications():
@@ -851,6 +1175,23 @@ def patient_profile():
     return render_template("patient_profile.html", patient=patient)
 
 
+@app.route("/patient/profile/photo", methods=["POST"])
+@login_required_patient
+def patient_profile_photo():
+    filename, error = save_uploaded_photo(request.files.get("photo"), session.get("patient_photo"))
+    if error:
+        flash(error)
+    else:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE patients SET photo_filename = ? WHERE id = ?", (filename, session["patient_id"]))
+        conn.commit()
+        conn.close()
+        session["patient_photo"] = filename
+        flash("Profile photo updated.")
+    return redirect(url_for("patient_profile"))
+
+
 # ---------- Static info pages ----------
 
 @app.route("/privacy")
@@ -876,6 +1217,8 @@ def contact():
 # ---------- App startup ----------
 
 create_database()
+migrate_database()
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 if __name__ == "__main__":
     app.run(debug=True)

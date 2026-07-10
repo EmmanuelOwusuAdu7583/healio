@@ -11,9 +11,9 @@
 <div class="hidden md:flex items-center gap-lg">
 <nav class="flex items-center gap-md">
 <a class="{{ 'text-primary bg-primary-container' if active == 'home' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all duration-150" href="{{ url_for('doctor_dashboard') }}">Home</a>
-<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_dashboard') }}">Patients</a>
+<a class="{{ 'text-primary bg-primary-container' if active == 'patients' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_patients') }}">Patients</a>
 <a class="{{ 'text-primary bg-primary-container' if active == 'schedule' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_schedule') }}">Schedule</a>
-<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Reports</a>
+<a class="{{ 'text-primary bg-primary-container' if active == 'reports' else 'text-on-surface-variant hover:bg-surface-container-high' }} font-label-md text-label-md px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_reports') }}">Reports</a>
 </nav>
 </div>
 <div class="flex items-center gap-md">
@@ -26,7 +26,7 @@ notifications
 <a class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
 <a class="flex items-center gap-sm" href="{{ url_for('doctor_profile') }}">
 <span class="hidden md:block text-right">
-<p class="font-label-md text-label-md text-on-surface">Dr. {{ session.doctor_name }}</p>
+<p class="font-label-md text-label-md text-on-surface">{{ session.doctor_name }}</p>
 </span>
 <div class="w-10 h-10 rounded-full border-2 border-primary-fixed overflow-hidden flex items-center justify-center bg-surface-container-highest">
 <span class="material-symbols-outlined text-on-surface-variant">person</span>

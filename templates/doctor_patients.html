@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Healio Doctor Dashboard - " + session.doctor_name %}
+{% set page_title = "Healio | Patients" %}
 {% include "_stitch_head.html" %}
 </head>
 <body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-24 md:pb-0">
@@ -38,58 +38,19 @@ notifications
 </a>
 </div>
 </header>
-<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-[1000px] mx-auto">
 {% include "_stitch_flash.html" %}
-<section class="mb-xl">
-<h1 class="font-headline-lg text-headline-lg md:text-headline-lg text-on-surface mb-xs">{{ greeting }}, {{ session.doctor_name }}</h1>
-<p class="text-body-lg font-body-lg text-on-surface-variant">Here is a summary of your patients and today's critical alerts.</p>
+<section class="mb-xl flex items-center justify-between">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Patients</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">All patients under your care.</p>
+</div>
+<a class="flex items-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-full font-label-md text-label-md" href="{{ url_for('new_patient') }}">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+Add Patient
+</a>
 </section>
-<div class="bento-grid">
-<div class="col-span-12 md:col-span-4 bento-card bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
-<div>
-<div class="flex items-center justify-between mb-sm">
-<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Patients</span>
-<div class="p-2 bg-primary-fixed rounded-lg">
-<span class="material-symbols-outlined text-primary">groups</span>
-</div>
-</div>
-<p class="font-headline-lg text-headline-lg text-on-surface">{{ total_patients }}</p>
-</div>
-</div>
-<div class="col-span-12 md:col-span-4 bento-card {{ 'bg-error-container border-l-4 border-error' if flagged_count else 'bg-surface-container-lowest' }} rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
-<div>
-<div class="flex items-center justify-between mb-sm">
-<span class="font-label-md text-label-md {{ 'text-on-error-container' if flagged_count else 'text-on-surface-variant' }} uppercase tracking-wider">Flagged / At-Risk</span>
-<div class="p-2 {{ 'bg-error' if flagged_count else 'bg-surface-container' }} rounded-lg">
-<span class="material-symbols-outlined {{ 'text-on-error' if flagged_count else 'text-on-surface-variant' }}" style="font-variation-settings: 'FILL' 1;">warning</span>
-</div>
-</div>
-<p class="font-headline-lg text-headline-lg {{ 'text-on-error-container' if flagged_count else 'text-on-surface' }}">{{ flagged_count }}</p>
-</div>
-</div>
-<div class="col-span-12 md:col-span-4 bento-card bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
-<div>
-<div class="flex items-center justify-between mb-sm">
-<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Today's Appointments</span>
-<div class="p-2 bg-tertiary-fixed rounded-lg">
-<span class="material-symbols-outlined text-tertiary">calendar_today</span>
-</div>
-</div>
-<p class="font-headline-lg text-headline-lg text-on-surface">{{ "%02d"|format(todays_appointment_count) }}</p>
-</div>
-<div class="mt-md">
-{% if next_appointment %}
-<p class="text-body-sm font-body-sm text-on-surface-variant">Next: {{ next_appointment.patient_name }} @ {{ next_appointment.appointment_at }}</p>
-{% else %}
-<p class="text-body-sm font-body-sm text-on-surface-variant">No upcoming appointments scheduled.</p>
-{% endif %}
-</div>
-</div>
-
-<div class="col-span-12 md:col-span-8 bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
-<div class="flex items-center justify-between mb-lg">
-<h2 class="font-headline-md text-headline-md text-on-surface">Recent Patient Updates</h2>
-</div>
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
 <div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-md">
 <span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
 <input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="patient-search" placeholder="Search patient name, ID, or diagnosis" type="text"/>
@@ -136,49 +97,9 @@ notifications
 </div>
 {% endif %}
 </div>
-
-<div class="col-span-12 md:col-span-4 space-y-md">
-<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
-<h2 class="font-headline-md text-headline-md text-on-surface mb-md">Quick Actions</h2>
-<div class="grid grid-cols-2 gap-sm">
-<a class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl hover:bg-primary-container hover:text-white transition-all group" href="{{ url_for('new_patient') }}">
-<span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">person_add</span>
-<span class="font-label-md text-label-md">Add Patient</span>
-</a>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">edit_calendar</span>
-<span class="font-label-md text-label-md">Schedule</span>
-</button>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">clinical_notes</span>
-<span class="font-label-md text-label-md">Draft Notes</span>
-</button>
-<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
-<span class="material-symbols-outlined mb-xs">mail</span>
-<span class="font-label-md text-label-md">Consults</span>
-</button>
-</div>
-</div>
-</div>
-</div>
 </main>
 {% include "_stitch_doctor_bottomnav.html" %}
 <script>
-        document.querySelectorAll('.bento-card').forEach(card => {
-            card.addEventListener('mousedown', () => { card.style.transform = 'scale(0.98)'; });
-            card.addEventListener('mouseup', () => { card.style.transform = 'translateY(-2px) scale(1)'; });
-            card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0) scale(1)'; });
-        });
-
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            if (window.scrollY > 20) {
-                header.classList.add('shadow-md');
-            } else {
-                header.classList.remove('shadow-md');
-            }
-        });
-
         const searchInput = document.getElementById('patient-search');
         if (searchInput) {
             searchInput.addEventListener('input', function () {
