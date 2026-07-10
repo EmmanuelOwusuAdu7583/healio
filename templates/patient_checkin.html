@@ -1,55 +1,113 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Daily Check-in — Healio" %}
+{% set page_title = "Healio - Daily Check-in" %}
 {% include "_stitch_head.html" %}
 </head>
-<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-background text-on-background min-h-screen flex flex-col">
 {% include "_stitch_topbar.html" %}
-<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-2xl mx-auto">
+<main class="flex-grow px-margin-mobile pt-lg pb-xl max-w-md mx-auto w-full">
 {% include "_stitch_flash.html" %}
-<section class="mb-md">
-<div class="flex justify-between items-baseline">
-<p class="text-label-sm text-on-surface-variant uppercase tracking-wide">Daily Adherence</p>
-<p class="text-label-md font-label-md text-primary">{{ taken_count }}/7</p>
-</div>
-<p class="font-label-md text-label-md text-on-surface mt-1">Weekly Progress</p>
-<div class="w-full h-2 bg-surface-container-low rounded-full mt-1 overflow-hidden">
-<div class="h-full bg-primary rounded-full" style="width: {{ (taken_count/7*100)|round|int }}%;"></div>
-</div>
+<section class="mb-lg">
+<h1 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface mb-xs">{{ greeting }}, {{ first_name }}</h1>
+<p class="text-body-lg text-on-surface-variant">It's a beautiful day to stay healthy.</p>
 </section>
 
-<div class="flex justify-between gap-1 mb-lg">
-{% for d in week_days %}
-<div class="flex flex-col items-center gap-1 {{ 'font-bold' if d.is_today }}">
-<span class="text-label-sm text-on-surface-variant">{{ d.letter }}</span>
-<span class="w-8 h-8 rounded-full flex items-center justify-center text-label-sm font-label-md {% if d.status == 'yes' %}bg-primary-container/10 text-primary{% elif d.status == 'no' %}bg-error-container text-error{% else %}bg-surface-container-low text-on-surface-variant{% endif %} {{ 'ring-2 ring-primary' if d.is_today }}">{{ d.num }}</span>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-lg mb-lg overflow-hidden relative">
+<div class="absolute top-0 right-0 p-lg opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[80px]" style="font-variation-settings: 'wght' 700;">medication</span>
 </div>
-{% endfor %}
+<div class="relative z-10">
+<span class="text-label-md font-label-md text-primary mb-xs block uppercase tracking-wider">Daily Routine</span>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-lg">Did you take your medication today?</h2>
+<div class="grid grid-cols-1 gap-md">
+<button class="btn-bounce transition-all duration-200 w-full py-xl rounded-xl bg-primary text-on-primary flex flex-col items-center justify-center gap-xs shadow-md" onclick="handleCheckin(true)" type="button">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-headline-md font-headline-md">Yes, I took it</span>
+</button>
+<button class="btn-bounce transition-all duration-200 w-full py-lg rounded-xl border-2 border-outline-variant text-on-surface-variant flex items-center justify-center gap-xs hover:bg-surface-container-low" onclick="handleCheckin(false)" type="button">
+<span class="material-symbols-outlined">cancel</span>
+<span class="text-body-lg font-semibold">Not yet</span>
+</button>
+</div>
+</div>
 </div>
 
-<div class="flex flex-col items-center text-center mb-lg">
-<div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center mb-sm">
-<span class="material-symbols-outlined text-primary text-3xl" data-icon="pill">pill</span>
+{% if next_appointment %}
+<div class="mt-lg p-lg bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Did you take your medication today?</h2>
-<p class="text-on-surface-variant font-body-sm mt-1">Consistency is key to your recovery plan. Please log your morning dose.</p>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Next Appointment</p>
+<p class="text-body-lg font-semibold text-on-surface">Dr. {{ next_appointment.doctor_name }}</p>
+<p class="text-body-sm text-on-surface-variant">{{ next_appointment.appointment_at }}{% if next_appointment.notes %} · {{ next_appointment.notes }}{% endif %}</p>
 </div>
-
-<form method="POST">
-<div class="grid grid-cols-2 gap-sm mb-md">
-<label class="bento-card border-2 border-outline-variant rounded-xl p-md flex flex-col items-center gap-2 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10">
-<input checked="" class="sr-only" name="took_medication" type="radio" value="yes"/>
-<span class="material-symbols-outlined text-primary text-3xl" data-icon="check_circle">check_circle</span>
-<span class="font-label-md text-label-md text-on-surface">Yes</span>
-</label>
-<label class="bento-card border-2 border-outline-variant rounded-xl p-md flex flex-col items-center gap-2 cursor-pointer has-[:checked]:border-error has-[:checked]:bg-error-container/40">
-<input class="sr-only" name="took_medication" type="radio" value="no"/>
-<span class="material-symbols-outlined text-error text-3xl" data-icon="cancel">cancel</span>
-<span class="font-label-md text-label-md text-on-surface">No</span>
-</label>
 </div>
-<button class="w-full bg-primary text-white font-label-md text-label-md py-4 rounded-full shadow-sm hover:bg-on-primary-fixed-variant active:scale-95 transition-all" type="submit">Save</button>
-</form>
+</div>
+{% else %}
+<div class="mt-lg p-lg bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">calendar_today</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Next Appointment</p>
+<p class="text-body-sm text-on-surface-variant">No appointments scheduled yet.</p>
+</div>
+</div>
+{% endif %}
 </main>
 {% include "_stitch_bottomnav.html" %}
+
+<div class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-lg hidden opacity-0 transition-opacity duration-300" id="checkin-modal">
+<div class="bg-surface-container-lowest rounded-xl p-xl max-w-sm w-full text-center shadow-xl">
+<div class="w-16 h-16 rounded-full mx-auto mb-lg flex items-center justify-center" id="modal-icon-container">
+<span class="material-symbols-outlined text-4xl" id="modal-icon"></span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-xs" id="modal-title"></h3>
+<p class="text-body-lg text-on-surface-variant mb-xl" id="modal-desc"></p>
+<button class="w-full py-md bg-primary text-on-primary rounded-xl font-semibold" onclick="closeModal()">Got it</button>
+</div>
+</div>
+<script>
+        function handleCheckin(taken) {
+            fetch("{{ url_for('patient_checkin') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "took_medication=" + (taken ? "yes" : "no")
+            });
+
+            const modal = document.getElementById('checkin-modal');
+            const iconContainer = document.getElementById('modal-icon-container');
+            const icon = document.getElementById('modal-icon');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+
+            if (taken) {
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto mb-lg flex items-center justify-center bg-secondary-container";
+                icon.innerText = "check_circle";
+                icon.style.color = "#00732a";
+                title.innerText = "Excellent!";
+                desc.innerText = "You're staying on track with your health journey. Keep it up!";
+            } else {
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto mb-lg flex items-center justify-center bg-error-container";
+                icon.innerText = "info";
+                icon.style.color = "#93000a";
+                title.innerText = "No Problem";
+                desc.innerText = "We'll remind you again in an hour. Don't forget, consistency is key!";
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('checkin-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                window.location.reload();
+            }, 300);
+        }
+    </script>
 </body></html>

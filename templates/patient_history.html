@@ -1,80 +1,75 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Healio | Check-in History" %}
+{% set page_title = "Healio | Patient Tracking History" %}
 {% include "_stitch_head.html" %}
 </head>
-<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
-{% include "_stitch_topbar.html" %}
-<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
-<section class="mb-lg">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Check-in History</h2>
-<p class="text-on-surface-variant font-body-md mt-1">A record of your past weekly submissions.</p>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-24">
+<header class="sticky top-0 z-50 bg-background flex justify-between items-center w-full px-margin-mobile h-16">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
+<img class="w-full h-full object-cover" alt="A professional close-up studio portrait of a mature male doctor in clinical attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAG7wpwxZXzcw3BG2xNe_l3DQq5VQom45aypEXJk2NtGPNeYHiKHU7JQyXTmSgayyFHcRKhsZoZ3DwxZStqGnZIMvrEzBaXsak9Gyo0t4_L8_yteaWKGAlawbfv2-Xv4VcpWv0NBvw5NHL2pTKZtKyh7wcDUlamCgCiqYjekM9rbIeDs67F7y23pAUI5u_vUsZ9-vEyOCzvELllIDXMfPaHY8KMkBnHjuewhkcZub9B5Xha37sb7Xf3YTkh5Xfgp32-Ntl9hl5MzE"/>
+</div>
+<h1 class="text-headline-md font-headline-md text-primary">Healio</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<main class="max-w-2xl mx-auto px-margin-mobile pt-6">
+{% include "_stitch_flash.html" %}
+<section class="mb-10">
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile mb-2">Tracking History</h2>
+<p class="text-on-surface-variant text-body-sm">Your weekly progress and clinical logs. Review patterns and flags over time.</p>
 </section>
-<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-sm">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
-<input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="history-search" placeholder="Search logs or symptoms" type="text"/>
+
+<div class="grid grid-cols-2 gap-md mb-xl">
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-secondary">
+<p class="text-label-md font-label-md text-on-surface-variant mb-1 uppercase">Completed</p>
+<p class="text-headline-md font-headline-md text-secondary">{{ reports|length }} Week{{ 's' if reports|length != 1 }}</p>
 </div>
-<div class="flex gap-2 mb-lg flex-wrap">
-<button class="filter-pill active px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm bg-primary text-white" data-filter="all">All Logs</button>
-<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="better">Better</button>
-<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="worse">Worse</button>
-<button class="filter-pill px-sm py-1 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant" data-filter="same">Neutral</button>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-error">
+<p class="text-label-md font-label-md text-on-surface-variant mb-1 uppercase">Flagged</p>
+<p class="text-headline-md font-headline-md text-error">{{ flagged_count }} Alert{{ 's' if flagged_count != 1 }}</p>
 </div>
+</div>
+
 {% if reports %}
-<div class="space-y-gutter" id="report-list">
+<div class="relative pl-8">
+<div class="absolute left-[11px] top-4 bottom-4 w-[2px] timeline-line opacity-50"></div>
 {% for report in reports %}
-<div class="bento-card report-item bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex flex-col gap-sm" data-trend="{{ report.symptom_trend }}" data-search="{{ (report.symptoms or '')|lower }} {{ (report.side_effects or '')|lower }} week {{ report.week_number }}">
-<div class="flex items-center justify-between">
-<h3 class="font-label-md text-label-md text-on-surface">Week {{ report.week_number }}</h3>
-<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full {% if report.symptom_trend == 'worse' %}bg-error-container text-error{% elif report.symptom_trend == 'better' %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">{{ report.symptom_trend|capitalize }}</span>
+<div class="relative mb-12">
+<div class="absolute -left-10 top-2 w-6 h-6 rounded-full {{ 'bg-error' if report.symptom_trend == 'worse' else 'bg-secondary' }} flex items-center justify-center ring-4 ring-background z-10">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">{{ 'priority_high' if report.symptom_trend == 'worse' else 'check' }}</span>
 </div>
-{% if report.symptoms %}<p class="text-on-surface-variant font-body-sm">Symptoms: {{ report.symptoms }}</p>{% endif %}
-<div class="flex items-center gap-4 text-on-surface-variant font-body-sm">
-<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base" data-icon="calendar_today">calendar_today</span> {{ report.created_at }}</span>
-<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base star-active" data-icon="star">star</span> {{ report.satisfaction_rating }} / 5</span>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="text-label-md font-label-md text-on-surface-variant">{{ report.created_at }}</span>
+<span class="px-2 py-0.5 rounded-full {{ 'bg-error-container text-on-error-container' if report.symptom_trend == 'worse' else 'bg-secondary-container text-on-secondary-container' }} text-[10px] font-bold uppercase tracking-wider">{{ 'Flagged' if report.symptom_trend == 'worse' else 'Completed' }}</span>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0px_8px_30px_rgba(0,0,0,0.08)] transition-shadow duration-200">
+<h3 class="text-headline-md font-headline-md mb-2 text-on-surface">Week {{ report.week_number }} Report</h3>
+<p class="text-body-sm text-on-surface-variant line-clamp-2">{{ report.symptoms or "No symptoms reported." }}</p>
+<div class="mt-4 flex items-center gap-2 text-primary font-semibold text-body-sm">
+<span>Satisfaction: {{ report.satisfaction_rating }}/5 ★</span>
+</div>
+</div>
 </div>
 </div>
 {% endfor %}
 </div>
-<div class="empty-state bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant" id="no-results" style="display:none;">No entries match your search or filter.</div>
 {% else %}
-<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant">No entries yet. Submit your first weekly report to start tracking your progress.</div>
-<a class="inline-block mt-sm bg-primary text-white font-label-md text-label-md px-md py-2 rounded-full hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('weekly_tracker') }}">Submit Weekly Report</a>
+<div class="bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl p-lg text-center text-on-surface-variant">
+No entries yet. Submit your first weekly report to start tracking your progress.
+</div>
+<a class="inline-block mt-sm bg-primary text-on-primary font-label-md text-label-md px-md py-2 rounded-full hover:bg-primary-container transition-all" href="{{ url_for('weekly_tracker') }}">Submit Weekly Report</a>
 {% endif %}
 </main>
 {% include "_stitch_bottomnav.html" %}
 <script>
-        const searchInput = document.getElementById('history-search');
-        const filterPills = document.querySelectorAll('.filter-pill');
-        let activeFilter = 'all';
-
-        function applyFilters() {
-            const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-            const items = document.querySelectorAll('.report-item');
-            let visibleCount = 0;
-            items.forEach(item => {
-                const matchesSearch = item.getAttribute('data-search').includes(query);
-                const matchesFilter = activeFilter === 'all' || item.getAttribute('data-trend') === activeFilter;
-                const show = matchesSearch && matchesFilter;
-                item.style.display = show ? '' : 'none';
-                if (show) visibleCount++;
-            });
-            const noResults = document.getElementById('no-results');
-            if (noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-        }
-
-        if (searchInput) searchInput.addEventListener('input', applyFilters);
-        filterPills.forEach(pill => {
-            pill.addEventListener('click', function () {
-                filterPills.forEach(p => {
-                    p.classList.remove('active', 'bg-primary', 'text-white');
-                    p.classList.add('text-on-surface-variant');
-                });
-                this.classList.add('active', 'bg-primary', 'text-white');
-                this.classList.remove('text-on-surface-variant');
-                activeFilter = this.getAttribute('data-filter');
-                applyFilters();
-            });
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mousedown', () => { card.style.transform = 'scale(0.98)'; });
+            card.addEventListener('mouseup', () => { card.style.transform = 'scale(1)'; });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'scale(1)'; });
         });
     </script>
 </body></html>

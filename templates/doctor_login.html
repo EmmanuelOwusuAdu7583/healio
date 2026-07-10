@@ -1,94 +1,98 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Doctor Login — Healio" %}
+{% set page_title = "Doctor Login - Healio" %}
 {% include "_stitch_head.html" %}
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
-<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop relative overflow-hidden">
-<div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-3xl"></div>
-<div class="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-surface-container-high/30 rounded-full blur-3xl"></div>
-<div class="w-full max-w-[440px] z-10">
-<div class="flex flex-col items-center mb-lg">
-<div class="w-16 h-16 clinical-gradient rounded-xl flex items-center justify-center mb-sm soft-elevation">
-<span class="material-symbols-outlined text-white text-[32px]" style="font-variation-settings: 'FILL' 1;">stethoscope</span>
+<header class="bg-background flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<a class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active-scale" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</a>
+<h1 class="text-headline-md font-headline-md text-primary">Doctor Login</h1>
 </div>
-<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Healio</h1>
+<div class="w-10 h-10 bg-primary-fixed rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
 </div>
-<div class="login-card-backdrop border border-outline-variant rounded-xl overflow-hidden soft-elevation">
-<div class="clinical-gradient px-lg py-xl text-center">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-white mb-xs">Doctor Login</h2>
-<p class="text-primary-fixed font-body-sm opacity-90">Clinical Excellence. Empathetic Care. Professional Gateway.</p>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile py-xl md:max-w-[480px] md:mx-auto w-full">
+<div class="text-center mb-xl">
+<div class="inline-flex items-center justify-center w-20 h-20 bg-primary-container text-on-primary-container rounded-3xl mb-md shadow-md">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">medical_information</span>
 </div>
-<div class="p-lg space-y-md">
+<h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface mb-xs">Welcome back, Doctor</h2>
+<p class="text-body-sm text-on-surface-variant max-w-[280px] mx-auto">Access your clinical dashboard and patient records securely.</p>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-xl p-lg soft-shadow border border-surface-variant/30">
 {% include "_stitch_flash.html" %}
-<form method="POST">
+<form class="space-y-lg" method="POST">
 <div class="space-y-xs">
-<label class="block font-label-md text-on-surface-variant ml-1" for="doctor-code">Doctor ID / Code</label>
-<div class="relative flex items-center group input-focus-ring border border-outline-variant bg-surface-container-lowest rounded-lg transition-all duration-200">
-<div class="pl-md pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
-<span class="material-symbols-outlined text-[20px]">badge</span>
+<label class="text-label-md font-label-md text-on-surface-variant block px-1" for="doctor_code">Doctor Code</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">badge</span>
 </div>
-<input class="w-full h-[48px] bg-transparent border-none focus:ring-0 px-md font-body-md text-on-surface placeholder:text-outline/50" id="doctor-code" name="doctor_code" placeholder="Enter your clinical code" type="text" autocapitalize="characters" required/>
-</div>
-</div>
-<div class="space-y-xs mt-md">
-<label class="block font-label-md text-on-surface-variant ml-1" for="password">Security Password</label>
-<div class="relative flex items-center group input-focus-ring border border-outline-variant bg-surface-container-lowest rounded-lg transition-all duration-200">
-<div class="pl-md pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
-<span class="material-symbols-outlined text-[20px]">lock</span>
-</div>
-<input class="w-full h-[48px] bg-transparent border-none focus:ring-0 px-md font-body-md text-on-surface placeholder:text-outline/50" id="password" name="password" placeholder="••••••••" type="password" required/>
-<button class="pr-md text-on-surface-variant hover:text-primary transition-colors" type="button" data-toggle-password="password"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<input class="block w-full pl-[44px] pr-md py-md bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-body-lg placeholder:text-outline" id="doctor_code" name="doctor_code" placeholder="e.g. DR-9921" required="" type="text" autocapitalize="characters"/>
 </div>
 </div>
-<div class="flex items-center justify-between py-xs mt-base">
-<label class="flex items-center space-x-2 cursor-pointer group">
-<input class="w-5 h-5 border-outline-variant rounded text-primary focus:ring-primary/20" type="checkbox"/>
-<span class="font-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Keep me signed in</span>
-</label>
-<a class="font-label-md text-primary hover:underline transition-all" href="#">Forgot Code?</a>
+<div class="space-y-xs">
+<div class="flex justify-between items-center px-1">
+<label class="text-label-md font-label-md text-on-surface-variant" for="password">Password</label>
+<a class="text-label-md font-label-md text-primary hover:underline" href="#">Forgot?</a>
 </div>
-<div class="pt-base">
-<button class="w-full h-[48px] bg-primary text-white font-label-md rounded-full hover:bg-primary-container active:scale-[0.98] transition-all duration-150 flex items-center justify-center space-x-2 shadow-lg shadow-primary/10" type="submit">
-<span>Secure Login</span>
-<span class="material-symbols-outlined text-[18px]">login</span>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">lock</span>
+</div>
+<input class="block w-full pl-[44px] pr-md py-md bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-body-lg" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-md flex items-center text-outline hover:text-on-surface-variant" type="button" id="toggle-password">
+<span class="material-symbols-outlined">visibility</span>
 </button>
 </div>
+</div>
+<div class="flex items-center gap-md p-md bg-secondary-container/10 border border-secondary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">verified_user</span>
+<p class="text-label-sm font-label-sm text-on-secondary-container leading-tight">Your session is protected with end-to-end clinical-grade encryption.</p>
+</div>
+<button class="w-full bg-primary text-on-primary py-md rounded-xl font-headline-md text-headline-md shadow-lg shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all duration-150" type="submit">
+Login
+</button>
 </form>
 </div>
-<div class="bg-surface-container-low p-md border-t border-outline-variant text-center">
-<p class="font-body-sm text-on-surface-variant">System access is restricted to authorized personnel only.</p>
-<p class="font-body-sm text-on-surface-variant mt-1">Patient access — Are you a patient? <a class="font-label-md text-primary hover:text-primary-container" href="{{ url_for('patient_login') }}">Sign in here</a></p>
+<div class="mt-xl text-center space-y-md">
+<p class="text-body-sm text-on-surface-variant">
+Need technical support?
+<a class="text-primary font-semibold hover:underline" href="#">Contact IT Helpdesk</a>
+</p>
+<p class="text-body-sm text-on-surface-variant">Are you a patient? <a class="text-primary font-semibold hover:underline" href="{{ url_for('patient_login') }}">Sign in here</a></p>
+<div class="flex items-center justify-center gap-md pt-md">
+<div class="h-[1px] bg-outline-variant flex-grow max-w-[40px]"></div>
+<span class="text-label-sm font-label-sm text-outline uppercase tracking-widest">Biometric access</span>
+<div class="h-[1px] bg-outline-variant flex-grow max-w-[40px]"></div>
 </div>
-</div>
-<div class="mt-lg flex flex-wrap justify-center gap-md opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
-<div class="flex items-center space-x-1.5">
-<span class="material-symbols-outlined text-sm">encrypted</span>
-<span class="font-label-sm uppercase tracking-widest text-[10px]">HIPAA Compliant</span>
-</div>
-<div class="flex items-center space-x-1.5">
-<span class="material-symbols-outlined text-sm">verified_user</span>
-<span class="font-label-sm uppercase tracking-widest text-[10px]">256-bit AES</span>
-</div>
-</div>
+<button class="inline-flex items-center gap-sm px-lg py-sm rounded-full border border-outline-variant hover:bg-surface-container transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined">fingerprint</span>
+<span class="text-label-md font-label-md">Sign in with Face ID / Touch ID</span>
+</button>
 </div>
 </main>
-<footer class="p-md text-center">
-<p class="font-label-sm text-outline">© 2026 Healio Health Systems. All rights reserved.</p>
+<footer class="mt-auto py-lg px-margin-mobile text-center">
+<div class="flex justify-center items-center gap-xs mb-sm">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Healio Clinical Server: Active</span>
+</div>
+<p class="text-[10px] text-outline leading-relaxed max-w-[320px] mx-auto">
+Authorized personnel only. All access is logged and monitored for compliance with healthcare data protection standards. Version 4.2.1-stable.
+</p>
 </footer>
 <script>
-        document.querySelectorAll('[data-toggle-password]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const input = document.getElementById(btn.getAttribute('data-toggle-password'));
-                const icon = btn.querySelector('.material-symbols-outlined');
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.textContent = 'visibility_off';
-                } else {
-                    input.type = 'password';
-                    icon.textContent = 'visibility';
-                }
-            });
+        const passwordInput = document.getElementById('password');
+        const toggleBtn = document.getElementById('toggle-password');
+
+        toggleBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            toggleBtn.querySelector('span').textContent = type === 'password' ? 'visibility' : 'visibility_off';
         });
     </script>
 </body></html>

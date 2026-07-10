@@ -1,87 +1,170 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Dashboard — Healio" %}
+{% set page_title = "Healio Doctor Dashboard - Dr. " + session.doctor_name %}
 {% include "_stitch_head.html" %}
 </head>
-<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
-<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-14">
-<div class="flex items-center gap-2">
-<div class="w-9 h-9 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/20 shrink-0">
-<img class="w-full h-full object-cover" alt="A professional headshot of a female doctor in a white clinical coat, smiling warmly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8S3K8d3d4hK7CG7ZonHko8j0tuV0GQyCx69lMxsIAILPIXFCUomTfNIKRYXkzjg49LRkRrOP9-bs9FcmmvB-wRBALn1Fbyc99ZRsVag4kGJp4M2EsYkH4wVy6OIXH2j4AtNbiSjR8J_eKlELUq8VHGwpIJ8w2kbUmn-rD3jQH7_lzjRXnt4lqkYWx_5YiXLx4sg9IiII1LnDhsVykwJvQ9zOfE_Yuvh348hYxI-eqJpwHCvXK4fYBPtIFyM5WTyV1r5coU-KPmFA"/>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed pb-24 md:pb-0">
+<header class="fixed top-0 left-0 w-full z-50 bg-background flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 transition-all duration-300">
+<div class="flex items-center gap-xs">
+<span class="text-primary font-headline-md text-headline-md tracking-tight">Healio</span>
 </div>
-<div>
-<p class="text-label-sm text-on-surface-variant leading-none">{{ greeting }}</p>
-<h1 class="font-headline-md text-headline-md font-bold text-primary leading-tight">Dr. {{ session.doctor_name.split(' ')[-1] }}</h1>
+<div class="hidden md:flex items-center gap-lg">
+<nav class="flex items-center gap-md">
+<a class="text-primary font-label-md text-label-md bg-primary-container px-4 py-2 rounded-full transition-all duration-150" href="{{ url_for('doctor_dashboard') }}">Home</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all" href="{{ url_for('doctor_dashboard') }}">Patients</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Schedule</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high px-4 py-2 rounded-full transition-all cursor-default" title="Not available yet">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<a class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-high" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
+<div class="flex items-center gap-sm">
+<span class="hidden md:block text-right">
+<p class="font-label-md text-label-md text-on-surface">Dr. {{ session.doctor_name }}</p>
+</span>
+<div class="w-10 h-10 rounded-full border-2 border-primary-fixed overflow-hidden">
+<img class="w-full h-full object-cover" alt="A professional studio portrait of a friendly male doctor in his late 40s wearing a white clinical coat and a blue stethoscope." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwRMmxRcq-HNyFGcAs6ZhUATxt4kSs0zersOS8NJhCGFyG_z6I4CWmyQ7sNeby6d_9EC-PW3UqUR09s0cUSA-3mqozwzOZcXunfd4DrrBjfHF6BqUrG6sbQpT_6SE6uTwm2w4369zjt_b89-dI58jYwfuFphvm2mHknqKZfW1CimUUlclvE64RV7i6CBqUGd_SIqxcD_0INvX0e61hEvLCxfv0424jMCJwqQy7S00dEkk1nBYplkBNhHkzycpOhqwtyG5jwUwhwBU"/>
 </div>
 </div>
-<div class="flex items-center gap-4">
-<a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full" data-icon="logout" href="{{ url_for('logout') }}" aria-label="Log out">logout</a>
 </div>
 </header>
-<main class="pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-5xl mx-auto">
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 {% include "_stitch_flash.html" %}
-<div class="grid grid-cols-2 gap-gutter mb-gutter">
-<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary text-3xl" data-icon="groups">groups</span>
-</div>
+<section class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg md:text-headline-lg text-on-surface mb-xs">{{ greeting }}, Dr. {{ session.doctor_name }}</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Here is a summary of your patients and today's critical alerts.</p>
+</section>
+<div class="bento-grid">
+<div class="col-span-12 md:col-span-4 bento-card bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
 <div>
-<p class="font-headline-md text-headline-md text-on-surface">{{ total_patients }}</p>
-<p class="text-on-surface-variant font-body-sm">Total Patients</p>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Patients</span>
+<div class="p-2 bg-primary-fixed rounded-lg">
+<span class="material-symbols-outlined text-primary">groups</span>
 </div>
 </div>
-<div class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-error text-3xl" data-icon="flag">flag</span>
+<p class="font-headline-lg text-headline-lg text-on-surface">{{ total_patients }}</p>
 </div>
+</div>
+<div class="col-span-12 md:col-span-4 bento-card {{ 'bg-error-container border-l-4 border-error' if flagged_count else 'bg-surface-container-lowest' }} rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
 <div>
-<p class="font-headline-md text-headline-md text-on-surface">{{ flagged_count }}</p>
-<p class="text-on-surface-variant font-body-sm">Flagged Patients</p>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-md text-label-md {{ 'text-on-error-container' if flagged_count else 'text-on-surface-variant' }} uppercase tracking-wider">Flagged / At-Risk</span>
+<div class="p-2 {{ 'bg-error' if flagged_count else 'bg-surface-container' }} rounded-lg">
+<span class="material-symbols-outlined {{ 'text-on-error' if flagged_count else 'text-on-surface-variant' }}" style="font-variation-settings: 'FILL' 1;">warning</span>
 </div>
 </div>
+<p class="font-headline-lg text-headline-lg {{ 'text-on-error-container' if flagged_count else 'text-on-surface' }}">{{ flagged_count }}</p>
 </div>
-<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-sm">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</div>
+<div class="col-span-12 md:col-span-4 bento-card bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Today's Appointments</span>
+<div class="p-2 bg-tertiary-fixed rounded-lg">
+<span class="material-symbols-outlined text-tertiary">calendar_today</span>
+</div>
+</div>
+<p class="font-headline-lg text-headline-lg text-on-surface">{{ "%02d"|format(todays_appointment_count) }}</p>
+</div>
+<div class="mt-md">
+{% if next_appointment %}
+<p class="text-body-sm font-body-sm text-on-surface-variant">Next: {{ next_appointment.patient_name }} @ {{ next_appointment.appointment_at }}</p>
+{% else %}
+<p class="text-body-sm font-body-sm text-on-surface-variant">No upcoming appointments scheduled.</p>
+{% endif %}
+</div>
+</div>
+
+<div class="col-span-12 md:col-span-8 bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Recent Patient Updates</h2>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant rounded-lg px-sm py-2 mb-md">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
 <input class="border-none bg-transparent outline-none font-body-sm w-full text-on-surface" id="patient-search" placeholder="Search patient name, ID, or diagnosis" type="text"/>
 </div>
-<a class="inline-flex items-center gap-1 bg-primary text-white font-label-md text-label-md px-md py-2 rounded-full hover:bg-on-primary-fixed-variant transition-all mb-gutter" href="{{ url_for('new_patient') }}">
-<span class="material-symbols-outlined text-[18px]">person_add</span> Add New Patient
-</a>
-<h3 class="font-label-md text-label-md text-on-surface mb-sm">Patient Watchlist</h3>
 {% if patients %}
-<div class="space-y-sm" id="patient-list">
+<div class="space-y-0" id="patient-list">
 {% for patient in patients %}
-<a class="bento-card bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md flex items-center justify-between patient-list-item" data-search="{{ patient.name|lower }} {{ patient.patient_code|lower }} {{ (patient.diagnosis or '')|lower }}" href="{{ url_for('patient_detail', patient_id=patient.id) }}">
-<div class="flex items-center gap-3">
-<span class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0" title="No photo uploaded yet">
-<span class="material-symbols-outlined text-[20px]">person</span>
+<a class="group flex items-center justify-between py-md border-b border-surface-variant last:border-0 hover:bg-surface-container-low transition-colors px-xs -mx-xs rounded-lg patient-list-item" data-search="{{ patient.name|lower }} {{ patient.patient_code|lower }} {{ (patient.diagnosis or '')|lower }}" href="{{ url_for('patient_detail', patient_id=patient.id) }}">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0" title="No photo uploaded yet">
+<span class="material-symbols-outlined">person</span>
 </span>
-<div>
-<p class="font-label-md text-label-md text-on-surface">{{ patient.name }}</p>
-<p class="text-on-surface-variant font-body-sm">{{ patient.patient_code }} · {{ patient.diagnosis or "No diagnosis on file" }}</p>
-</div>
-</div>
 {% if patient.active_flags > 0 %}
-<span class="bg-error-container text-error text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">{{ patient.active_flags }} flag{{ 's' if patient.active_flags > 1 }}</span>
-{% else %}
-<span class="bg-primary-container/10 text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">Stable</span>
+<div class="absolute -bottom-1 -right-1 bg-error rounded-full p-0.5 border-2 border-white">
+<span class="material-symbols-outlined text-[12px] text-white" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
 {% endif %}
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">{{ patient.name }}</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">{{ patient.patient_code }} · {{ patient.diagnosis or "No diagnosis on file" }}</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-xs">
+{% if patient.active_flags > 0 %}
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-sm text-label-sm font-bold uppercase">{{ patient.active_flags }} flag{{ 's' if patient.active_flags > 1 }}</span>
+{% else %}
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm font-bold uppercase">Stable</span>
+{% endif %}
+</div>
 </a>
 {% endfor %}
 </div>
-<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant mt-sm" id="no-results" style="display:none;">No patients match your search.</div>
+<div class="text-center text-on-surface-variant py-md" id="no-results" style="display:none;">No patients match your search.</div>
 {% else %}
-<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
-<span class="material-symbols-outlined text-3xl" data-icon="groups">groups</span>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-md flex flex-col items-center justify-center gap-2 text-on-surface-variant min-h-[140px]">
+<span class="material-symbols-outlined text-3xl">groups</span>
 <span class="font-label-md text-label-md">No patients yet. Add your first patient to get started.</span>
 </div>
 {% endif %}
-</main>
-<a class="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg z-50 hover:bg-on-primary-fixed-variant transition-all" href="{{ url_for('new_patient') }}" aria-label="Add new patient">
-<span class="material-symbols-outlined text-3xl">person_add</span>
+</div>
+
+<div class="col-span-12 md:col-span-4 space-y-md">
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-md">Quick Actions</h2>
+<div class="grid grid-cols-2 gap-sm">
+<a class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl hover:bg-primary-container hover:text-white transition-all group" href="{{ url_for('new_patient') }}">
+<span class="material-symbols-outlined mb-xs text-primary group-hover:text-white">person_add</span>
+<span class="font-label-md text-label-md">Add Patient</span>
 </a>
+<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
+<span class="material-symbols-outlined mb-xs">edit_calendar</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
+<span class="material-symbols-outlined mb-xs">clinical_notes</span>
+<span class="font-label-md text-label-md">Draft Notes</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md bg-surface-container rounded-xl text-on-surface-variant cursor-default" title="Not available yet" type="button">
+<span class="material-symbols-outlined mb-xs">mail</span>
+<span class="font-label-md text-label-md">Consults</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
 {% include "_stitch_doctor_bottomnav.html" %}
 <script>
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mousedown', () => { card.style.transform = 'scale(0.98)'; });
+            card.addEventListener('mouseup', () => { card.style.transform = 'translateY(-2px) scale(1)'; });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0) scale(1)'; });
+        });
+
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+
         const searchInput = document.getElementById('patient-search');
         if (searchInput) {
             searchInput.addEventListener('input', function () {

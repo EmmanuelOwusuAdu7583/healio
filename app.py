@@ -106,6 +106,19 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            appointment_at TIMESTAMP NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -274,6 +287,22 @@ def doctor_dashboard():
         ORDER BY active_flags DESC, p.created_at DESC
     """, (session["doctor_id"],))
     patients = cursor.fetchall()
+
+    today = date.today().isoformat()
+    cursor.execute("""
+        SELECT COUNT(*) as c FROM appointments
+        WHERE doctor_id = ? AND appointment_at LIKE ?
+    """, (session["doctor_id"], today + "%"))
+    todays_appointment_count = cursor.fetchone()["c"]
+
+    cursor.execute("""
+        SELECT a.*, p.name as patient_name FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        WHERE a.doctor_id = ? AND a.appointment_at >= ?
+        ORDER BY a.appointment_at ASC LIMIT 1
+    """, (session["doctor_id"], datetime.now().isoformat()))
+    next_appointment = cursor.fetchone()
+
     conn.close()
 
     total_patients = len(patients)
@@ -292,6 +321,8 @@ def doctor_dashboard():
         patients=patients,
         total_patients=total_patients,
         flagged_count=flagged_count,
+        todays_appointment_count=todays_appointment_count,
+        next_appointment=next_appointment,
         active="home",
         greeting=greeting,
     )
@@ -367,6 +398,11 @@ def patient_detail(patient_id):
     """, (patient_id,))
     active_flags = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT * FROM appointments WHERE patient_id = ? ORDER BY appointment_at DESC
+    """, (patient_id,))
+    appointments = cursor.fetchall()
+
     conn.close()
 
     adherence_pct = None
@@ -389,10 +425,36 @@ def patient_detail(patient_id):
         daily_checkins=daily_checkins,
         notes=notes,
         active_flags=active_flags,
+        appointments=appointments,
         adherence_pct=adherence_pct,
         trend_points=trend_points,
         active="patients",
     )
+
+
+@app.route("/doctor/patients/<int:patient_id>/appointments/new", methods=["POST"])
+@login_required_doctor
+def new_appointment(patient_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM patients WHERE id = ? AND doctor_id = ?", (patient_id, session["doctor_id"]))
+    patient = cursor.fetchone()
+    if not patient:
+        conn.close()
+        return redirect(url_for("doctor_dashboard"))
+
+    appointment_at = request.form.get("appointment_at", "").strip()
+    notes = request.form.get("notes", "").strip()
+    if appointment_at:
+        cursor.execute("""
+            INSERT INTO appointments (patient_id, doctor_id, appointment_at, notes)
+            VALUES (?, ?, ?, ?)
+        """, (patient_id, session["doctor_id"], appointment_at, notes))
+        conn.commit()
+        flash("Appointment scheduled.")
+
+    conn.close()
+    return redirect(url_for("patient_detail", patient_id=patient_id))
 
 
 @app.route("/doctor/flags/<int:flag_id>/resolve", methods=["POST"])
@@ -527,9 +589,37 @@ def patient_checkin():
             "status": (None if not row else ("yes" if row["took_medication"] else "no")),
         })
     taken_count = sum(1 for d in week_days if d["status"] == "yes")
+
+    cursor.execute("""
+        SELECT a.*, d.name as doctor_name FROM appointments a
+        JOIN doctors d ON a.doctor_id = d.id
+        WHERE a.patient_id = ? AND a.appointment_at >= ?
+        ORDER BY a.appointment_at ASC LIMIT 1
+    """, (session["patient_id"], datetime.now().isoformat()))
+    next_appointment = cursor.fetchone()
+
+    cursor.execute("SELECT name FROM patients WHERE id = ?", (session["patient_id"],))
+    patient_name = cursor.fetchone()["name"]
+
     conn.close()
 
-    return render_template("patient_checkin.html", active="checkin", week_days=week_days, taken_count=taken_count)
+    hour = datetime.now().hour
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 17:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+    return render_template(
+        "patient_checkin.html",
+        active="checkin",
+        week_days=week_days,
+        taken_count=taken_count,
+        next_appointment=next_appointment,
+        greeting=greeting,
+        first_name=patient_name.split(" ")[0],
+    )
 
 
 @app.route("/patient/weekly-tracker", methods=["GET", "POST"])
@@ -576,8 +666,14 @@ def patient_history():
         SELECT * FROM weekly_reports WHERE patient_id = ? ORDER BY week_number DESC
     """, (session["patient_id"],))
     reports = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT COUNT(*) as c FROM flags WHERE patient_id = ? AND resolved = 0
+    """, (session["patient_id"],))
+    flagged_count = cursor.fetchone()["c"]
+
     conn.close()
-    return render_template("patient_history.html", reports=reports, active="history")
+    return render_template("patient_history.html", reports=reports, flagged_count=flagged_count, active="history")
 
 
 @app.route("/patient/notes")

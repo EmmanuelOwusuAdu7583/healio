@@ -118,6 +118,26 @@
             height: 200px;
             position: relative;
         }
+        .active-nav-item {
+            transition: transform 0.15s ease-in-out;
+        }
+        .active-nav-item:active {
+            transform: scale(0.98);
+        }
+        .btn-bounce {
+            transition: transform 0.2s;
+        }
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+        .timeline-line {
+            background: linear-gradient(to bottom, transparent, #cbd5e1 15%, #cbd5e1 85%, transparent);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
