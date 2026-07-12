@@ -3,6 +3,7 @@
 Medication tracking and doctor-patient remote monitoring platform. Patients log daily medication adherence and weekly symptom reports; doctors monitor patients through a dashboard with automatic risk flagging.
 
 Repo: https://github.com/EmmanuelOwusuAdu7583/ma-nkwa
+Live app: https://ma-nkwa.onrender.com
 
 ## Tech Stack
 
