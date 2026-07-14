@@ -86,14 +86,16 @@ Add Appointment
 <a class="px-md py-2 rounded-full border {{ 'bg-primary text-on-primary border-primary' if view == 'month' else 'border-outline-variant text-on-surface-variant hover:bg-surface-container' }} text-label-md font-label-md transition-colors" href="{{ url_for('doctor_schedule', view='month') }}">Month</a>
 </div>
 {% if view == 'week' %}
-<div class="grid grid-cols-7 gap-xs md:gap-md p-xs bg-surface-container-low rounded-xl">
+<div class="overflow-x-auto -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
+<div class="flex md:grid md:grid-cols-7 gap-xs md:gap-md p-xs bg-surface-container-low rounded-xl">
 {% for d in week_days %}
-<a class="flex flex-col items-center justify-center p-md rounded-xl shadow-sm border-2 transition-all {{ 'bg-primary text-on-primary border-primary' if selected_day == d.isoformat() else 'bg-surface-container-lowest border-transparent hover:border-primary-container text-on-surface' }}" href="{{ url_for('doctor_schedule', view='week', day=d.isoformat()) }}">
+<a class="shrink-0 basis-[64px] md:basis-auto flex flex-col items-center justify-center p-md rounded-xl shadow-sm border-2 transition-all {{ 'bg-primary text-on-primary border-primary' if selected_day == d.isoformat() else 'bg-surface-container-lowest border-transparent hover:border-primary-container text-on-surface' }}" href="{{ url_for('doctor_schedule', view='week', day=d.isoformat()) }}">
 <span class="text-label-sm font-label-sm uppercase {{ 'text-on-primary' if selected_day == d.isoformat() else 'text-on-surface-variant' }}">{{ d.strftime('%a') }}</span>
 <span class="text-headline-md font-headline-md">{{ d.day }}</span>
 {% if d == today %}<div class="w-1.5 h-1.5 {{ 'bg-on-primary' if selected_day == d.isoformat() else 'bg-primary' }} rounded-full mt-1"></div>{% endif %}
 </a>
 {% endfor %}
+</div>
 </div>
 {% endif %}
 </section>

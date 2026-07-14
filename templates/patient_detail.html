@@ -83,7 +83,15 @@ notifications
 </div>
 </div>
 {% elif trend_points|length == 1 %}
-<p class="text-body-sm text-on-surface-variant">Only one rated report so far (Week {{ trend_points[0].week }}: {{ trend_points[0].rating }}/5) — the trend line will appear once there's a second one.</p>
+<div class="chart-container flex items-end justify-between px-2 gap-4">
+<svg class="absolute inset-0 w-full h-full line-graph-svg" preserveAspectRatio="none" viewBox="0 0 800 200">
+<circle cx="{{ trend_points[0].x }}" cy="{{ trend_points[0].y }}" r="8" fill="#003d9b"></circle>
+</svg>
+<div class="absolute bottom-0 w-full flex justify-start text-label-sm font-label-sm text-on-surface-variant pt-2">
+<span>Week {{ trend_points[0].week }}</span>
+</div>
+</div>
+<p class="text-label-sm text-on-surface-variant mt-2">Only one rated report so far ({{ trend_points[0].rating }}/5) — the trend line will appear once there's a second one.</p>
 {% else %}
 <div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant">No rated reports yet.</div>
 {% endif %}
@@ -163,7 +171,10 @@ notifications
 {% endfor %}
 </div>
 {% else %}
-<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-md text-center text-on-surface-variant">No check-ins yet.</div>
+<div class="bento-card border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">fact_check</span>
+<span class="font-label-md text-label-md">No check-ins yet — {{ patient.name }} hasn't logged a daily check-in.</span>
+</div>
 {% endif %}
 </section>
 
@@ -206,9 +217,9 @@ notifications
 <span class="material-symbols-outlined text-primary">edit_note</span>
 <h2 class="text-headline-md font-headline-md text-on-surface">Doctor Notes</h2>
 </div>
-<form method="POST">
-<textarea class="w-full min-h-[160px] bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-lg font-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none" name="note_text" placeholder="Enter clinical observations, lifestyle recommendations, or medication adjustments..." required></textarea>
-<div class="mt-lg flex justify-end">
+<form class="bg-surface-container-low border border-outline-variant rounded-lg p-md" method="POST">
+<textarea class="w-full min-h-[160px] bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-lg font-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none" name="note_text" placeholder="Enter clinical observations, lifestyle recommendations, or medication adjustments..." required></textarea>
+<div class="mt-md flex justify-end">
 <button class="bg-primary text-on-primary px-xl py-md rounded-full font-bold flex items-center gap-2 shadow-lg hover:bg-primary-container transition-all active:scale-95" type="submit">
 <span class="material-symbols-outlined">save</span>
 <span>Save Note</span>
@@ -252,7 +263,7 @@ notifications
 </div>
 <textarea class="w-full min-h-[80px] bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-sm font-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none" name="summary" placeholder="Summary of findings..."></textarea>
 <div class="flex flex-wrap items-center gap-sm">
-<input class="text-body-sm font-body-sm text-on-surface-variant flex-grow" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"/>
+<input class="flex-grow text-body-sm font-body-sm text-on-surface-variant file:mr-sm file:px-md file:py-2 file:rounded-full file:border-0 file:bg-primary-container/20 file:text-primary file:font-label-md file:text-label-md file:cursor-pointer hover:file:bg-primary-container/30 transition-colors cursor-pointer" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"/>
 <button class="bg-primary text-on-primary px-lg py-2 rounded-full font-label-md text-label-md shrink-0" type="submit">Add Record</button>
 </div>
 </form>
@@ -296,7 +307,7 @@ notifications
 </div>
 <textarea class="w-full min-h-[80px] bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-sm font-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none" name="instructions" placeholder="Instructions..."></textarea>
 <div class="flex flex-wrap items-center gap-sm">
-<input class="text-body-sm font-body-sm text-on-surface-variant flex-grow" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"/>
+<input class="flex-grow text-body-sm font-body-sm text-on-surface-variant file:mr-sm file:px-md file:py-2 file:rounded-full file:border-0 file:bg-primary-container/20 file:text-primary file:font-label-md file:text-label-md file:cursor-pointer hover:file:bg-primary-container/30 transition-colors cursor-pointer" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"/>
 <button class="bg-primary text-on-primary px-lg py-2 rounded-full font-label-md text-label-md shrink-0" type="submit">Add Prescription</button>
 </div>
 </form>
