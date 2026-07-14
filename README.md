@@ -5,6 +5,23 @@ Medication tracking and doctor-patient remote monitoring platform. Patients log 
 Repo: https://github.com/EmmanuelOwusuAdu7583/ma-nkwa
 Live app: https://ma-nkwa.onrender.com
 
+## Screenshots
+
+<table>
+<tr>
+<td><img src="screenshots/welcome.png" width="260" alt="Welcome / landing page"/></td>
+<td><img src="screenshots/patient_dashboard.png" width="260" alt="Patient dashboard"/></td>
+<td><img src="screenshots/doctor_dashboard.png" width="260" alt="Doctor dashboard"/></td>
+</tr>
+<tr>
+<td align="center">Welcome</td>
+<td align="center">Patient dashboard</td>
+<td align="center">Doctor dashboard</td>
+</tr>
+</table>
+
+<img src="screenshots/nav_lamp_closeup.png" width="500" alt="Bottom nav active-tab lamp indicator"/>
+
 ## Tech Stack
 
 - Python 3 / Flask

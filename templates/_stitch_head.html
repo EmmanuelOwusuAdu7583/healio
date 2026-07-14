@@ -135,6 +135,13 @@ if ('serviceWorker' in navigator) {
         .active-nav-item:active {
             transform: scale(0.98);
         }
+        @keyframes tubelight-in {
+            from { opacity: 0; transform: translateX(-50%) scaleX(0.4); }
+            to { opacity: 1; transform: translateX(-50%) scaleX(1); }
+        }
+        .tubelight-lamp {
+            animation: tubelight-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .btn-bounce {
             transition: transform 0.2s;
         }
