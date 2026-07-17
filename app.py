@@ -8,12 +8,21 @@ from functools import wraps
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 
+import psycopg2
+import psycopg2.extras
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "healio-fallback-key-for-local-dev-only")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "healio-fallback-admin-for-local-dev-only")
 ADMIN_CONTACT_EMAIL = os.environ.get("ADMIN_CONTACT_EMAIL", "admin@healio.local")
 app.permanent_session_lifetime = timedelta(days=30)
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+
+# If set, use Postgres (e.g. Neon) instead of the local SQLite file. Every
+# query in this file is written with SQLite's '?' placeholders; _PGCursor
+# below translates them to psycopg2's '%s' so none of those call sites need
+# to change depending on backend.
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DB_PATH = "healio.db"
 UPLOAD_FOLDER = os.path.join("static", "uploads")
@@ -36,13 +45,52 @@ def handle_file_too_large(e):
 
 # ---------- Database ----------
 
+class _PGCursor:
+    """Wraps a psycopg2 cursor so the app's SQLite-style '?' queries work unchanged."""
+
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, sql, params=()):
+        return self._cursor.execute(sql.replace("?", "%s"), params)
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+
+class _PGConnection:
+    """Wraps a psycopg2 connection so get_db() callers don't need to know the backend."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self):
+        return _PGCursor(self._conn.cursor())
+
+    def commit(self):
+        self._conn.commit()
+
+    def close(self):
+        self._conn.close()
+
+
 def get_db():
+    if DATABASE_URL:
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        return _PGConnection(conn)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def create_database():
+    if DATABASE_URL:
+        create_database_postgres()
+        return
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -193,7 +241,192 @@ def create_database():
     conn.close()
 
 
+def create_database_postgres():
+    """Postgres-flavored twin of create_database(). Keep the two in sync.
+
+    Column type deltas from the SQLite schema, and why:
+    - id: SERIAL PRIMARY KEY instead of INTEGER PRIMARY KEY AUTOINCREMENT.
+    - flags.resolved: INTEGER (not BOOLEAN) because the app compares/sets it
+      with raw SQL literals like "resolved = 0" and "SET resolved = 1" in
+      several places - Postgres won't implicitly compare boolean = integer.
+    - appointments.appointment_at: TEXT (not TIMESTAMP) because it's filtered
+      with LIKE in doctor_dashboard(), and Postgres doesn't allow LIKE on a
+      native timestamp column.
+    - medical_records.record_date / prescriptions.prescribed_date: TEXT (not
+      DATE) because the form fields are optional and can be inserted as ''
+      when left blank - a native DATE column would reject that.
+    - daily_checkins.check_date: TEXT for the same reason/consistency, even
+      though today's callers always populate it.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS doctors (
+            id SERIAL PRIMARY KEY,
+            doctor_code TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            password TEXT NOT NULL,
+            photo_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS patients (
+            id SERIAL PRIMARY KEY,
+            patient_code TEXT UNIQUE NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            password TEXT NOT NULL,
+            diagnosis TEXT,
+            medication TEXT,
+            treatment_duration TEXT,
+            photo_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS daily_checkins (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            check_date TEXT NOT NULL,
+            took_medication BOOLEAN NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS weekly_reports (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            week_number INTEGER NOT NULL,
+            symptoms TEXT,
+            side_effects TEXT,
+            noticeable_changes TEXT,
+            symptom_trend TEXT,
+            satisfaction_rating INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS doctor_notes (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            note_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS flags (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            flag_reason TEXT NOT NULL,
+            resolved INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS appointments (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            appointment_at TEXT NOT NULL,
+            notes TEXT,
+            status TEXT DEFAULT 'scheduled',
+            appointment_type TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id SERIAL PRIMARY KEY,
+            recipient_type TEXT NOT NULL,
+            recipient_id INTEGER NOT NULL,
+            message TEXT NOT NULL,
+            link TEXT,
+            read_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS medical_records (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            record_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            summary TEXT,
+            record_date TEXT,
+            file_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS prescriptions (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            doctor_id INTEGER NOT NULL,
+            medication_name TEXT NOT NULL,
+            dosage TEXT,
+            instructions TEXT,
+            prescribed_date TEXT,
+            file_filename TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS patient_documents (
+            id SERIAL PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            file_size INTEGER,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES patients(id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
 def migrate_database():
+    if DATABASE_URL:
+        conn = get_db()
+        cursor = conn.cursor()
+        # Postgres supports "IF NOT EXISTS" on ADD COLUMN directly, so unlike
+        # the SQLite path below there's no need to check PRAGMA table_info
+        # first - these are all no-ops once the columns already exist.
+        cursor.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS photo_filename TEXT")
+        cursor.execute("ALTER TABLE patients ADD COLUMN IF NOT EXISTS photo_filename TEXT")
+        cursor.execute("ALTER TABLE appointments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'scheduled'")
+        cursor.execute("ALTER TABLE appointments ADD COLUMN IF NOT EXISTS appointment_type TEXT")
+        conn.commit()
+        conn.close()
+        return
+
     conn = get_db()
     cursor = conn.cursor()
     for table in ("doctors", "patients"):
