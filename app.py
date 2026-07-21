@@ -1781,4 +1781,9 @@ create_database()
 migrate_database()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # host='0.0.0.0' makes the dev server reachable from other devices on
+    # the same network (e.g. a phone), not just localhost. This block only
+    # runs under `python app.py` - gunicorn (used in production) imports
+    # this file as a module instead, so __name__ != "__main__" there and
+    # this never executes on Render.
+    app.run(host="0.0.0.0", port=5000, debug=True)
