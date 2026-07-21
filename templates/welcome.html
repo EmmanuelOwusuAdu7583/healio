@@ -1,104 +1,69 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-{% set page_title = "Ma Nkwa | Empowering Care, Simplified" %}
+{% set page_title = "Ma Nkwa | Giving Life Every Day" %}
 {% include "_stitch_head.html" %}
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
-<header class="bg-background flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 fixed top-0 z-50 border-b border-outline-variant">
+<header class="bg-background/80 backdrop-blur-md flex items-center w-full px-margin-mobile md:px-margin-desktop h-16 fixed top-0 z-50 border-b border-outline-variant/30">
 <div class="flex items-center gap-2">
 <img class="h-9 w-auto object-contain" src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Ma Nkwa"/>
 </div>
 </header>
-<main class="flex-grow flex flex-col items-center justify-center pt-24 pb-16 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
-<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-<img alt="" class="w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZdLs4cceqUTQ1KPYKD3MPFU0HIgmuhdGbYB5tH354csbLRWpCP_EGxN_-HYQ_qoG0nk8DQU3KObUoXFU3GKx4CZzOrmxGiCX1bmAMTS7i2l5rBX_iPQH9pLakKU4hYPrDvgtAKCafWRdvT5szLLwu9sOMxfYRyesK_GdewEx-51ABrpGqw2qu3rto5HiKo2AU-s_GRL5HaccnM7rDmNAJyH0Kj9ZHl0gYNwzbkd5OcfQvkf4uAXwVik0dTLZf9RALa0JwnNt05vI"/>
-<div class="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-background"></div>
-<div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-secondary-container/40 rounded-full blur-3xl"></div>
+<main class="flex-grow flex flex-col items-center pt-24 pb-16 px-margin-mobile md:px-margin-desktop relative">
+<div class="max-w-4xl w-full text-center z-10 flex flex-col items-center">
+<div class="mb-6 w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center p-3">
+<img alt="Ma Nkwa" class="w-full h-full object-contain" src="{{ url_for('static', filename='icons/icon-192.png') }}"/>
 </div>
-<div class="max-w-4xl w-full text-center z-10 flex flex-col items-center relative">
-<div class="mb-8 p-6 bg-white rounded-full shadow-lg inline-flex items-center justify-center">
-<span class="material-symbols-outlined text-primary text-6xl" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
-</div>
-<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-background mb-4 tracking-tight">
-Empowering Care, Simplified
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-background mb-3 tracking-tight">
+Giving Life Every Day
 </h1>
-<p class="text-body-lg text-on-surface-variant max-w-2xl mb-12">
-The next-generation healthcare platform bridging the gap between doctors and patients through intelligent data and human-centric design.
+<p class="text-body-lg text-on-surface-variant max-w-2xl mb-10 leading-relaxed">
+Connect with healthcare professionals or manage your health journey through our intelligent clinical platform.
 </p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-lg w-full max-w-2xl">
-<a class="group flex flex-col items-center p-xl bg-white rounded-[24px] shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-transparent hover:border-primary transition-all duration-300 hover:shadow-[0px_8px_30px_rgba(0,0,0,0.08)]" href="{{ url_for('doctor_login') }}">
-<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
-<span class="material-symbols-outlined text-primary group-hover:text-white text-3xl">stethoscope</span>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg w-full max-w-3xl">
+<a class="group flex flex-col items-center p-lg bg-white rounded-xl shadow-sm border border-outline-variant/50 hover:border-primary transition-all duration-300 hover:shadow-md" href="{{ url_for('doctor_login') }}">
+<div class="w-14 h-14 bg-primary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white text-2xl">stethoscope</span>
 </div>
 <span class="text-headline-md font-headline-md text-on-background mb-2">I am a Doctor</span>
-<span class="text-label-md font-label-md text-on-surface-variant text-center">Manage practice, patients, and schedule with clinical precision.</span>
-<div class="mt-lg px-6 py-3 bg-primary text-white rounded-full font-semibold transition-all group-hover:px-8">
+<p class="text-body-sm text-on-surface-variant text-center mb-lg h-10 px-4">Manage practice, patients, and schedule with clinical precision.</p>
+<div class="w-full py-3 bg-primary text-white rounded-lg font-semibold transition-all group-hover:bg-on-primary-fixed-variant">
 Enter Practice
 </div>
 </a>
-<a class="group flex flex-col items-center p-xl bg-white rounded-[24px] shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-transparent hover:border-primary transition-all duration-300 hover:shadow-[0px_8px_30px_rgba(0,0,0,0.08)]" href="{{ url_for('patient_login') }}">
-<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
-<span class="material-symbols-outlined text-primary group-hover:text-white text-3xl">person</span>
+<a class="group flex flex-col items-center p-lg bg-white rounded-xl shadow-sm border border-outline-variant/50 hover:border-secondary transition-all duration-300 hover:shadow-md" href="{{ url_for('patient_login') }}">
+<div class="w-14 h-14 bg-secondary-fixed rounded-full flex items-center justify-center mb-md group-hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined text-secondary group-hover:text-white text-2xl">person</span>
 </div>
 <span class="text-headline-md font-headline-md text-on-background mb-2">I am a Patient</span>
-<span class="text-label-md font-label-md text-on-surface-variant text-center">Access records, book appointments, and track your health journey.</span>
-<div class="mt-lg px-6 py-3 bg-primary text-white rounded-full font-semibold transition-all group-hover:px-8">
+<p class="text-body-sm text-on-surface-variant text-center mb-lg h-10 px-4">Access records, book appointments, and track your health journey.</p>
+<div class="w-full py-3 bg-secondary text-white rounded-lg font-semibold transition-all group-hover:bg-on-secondary-fixed-variant">
 Access Health
 </div>
 </a>
 </div>
 </div>
-<div class="mt-24 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-md">
-<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
-<span class="material-symbols-outlined text-primary text-3xl">security</span>
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface">Data Privacy</h3>
-<p class="text-body-sm text-on-surface-variant">HIPAA-compliant end-to-end encryption for all medical records.</p>
-</div>
-</div>
-<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
-<span class="material-symbols-outlined text-primary text-3xl">bolt</span>
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface">Instant Access</h3>
-<p class="text-body-sm text-on-surface-variant">Real-time collaboration between care teams and patients.</p>
-</div>
-</div>
-<div class="bento-card bg-surface-container-low p-lg rounded-xl flex flex-col justify-between h-48">
-<span class="material-symbols-outlined text-primary text-3xl">analytics</span>
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface">Smart Insights</h3>
-<p class="text-body-sm text-on-surface-variant">Predictive analytics to help identify health trends early.</p>
-</div>
-</div>
-</div>
 </main>
-<footer class="bg-surface-container-lowest py-12 px-margin-mobile md:px-margin-desktop mt-auto border-t border-outline-variant">
-<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-lg">
+<footer class="bg-surface-container-lowest py-8 px-margin-mobile md:px-margin-desktop mt-auto border-t border-outline-variant/30">
+<div class="max-w-6xl mx-auto flex flex-col items-center gap-md">
 <div class="flex items-center gap-2">
-<img class="h-7 w-auto object-contain" src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Ma Nkwa"/>
+<img class="h-5 w-5 object-contain" src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="Ma Nkwa"/>
+<span class="font-bold text-primary text-body-sm">Ma Nkwa</span>
 </div>
-<nav class="flex gap-lg flex-wrap justify-center">
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('privacy') }}">Privacy Policy</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('terms') }}">Terms of Service</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('help_center') }}">Help Center</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('contact') }}">Contact Support</a>
+<nav class="flex gap-md flex-wrap justify-center">
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('privacy') }}">Privacy Policy</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('terms') }}">Terms of Service</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('help_center') }}">Help Center</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('contact') }}">Contact Support</a>
 </nav>
 <div class="text-label-sm font-label-sm text-outline">
 © 2026 Ma Nkwa Health Systems. All rights reserved.
 </div>
 </div>
 </footer>
-<div class="fixed inset-0 pointer-events-none z-[100] opacity-0 transition-opacity duration-300 bg-[radial-gradient(circle_400px_at_var(--x)_var(--y),rgba(0,61,155,0.05),transparent)]" id="mouse-glow"></div>
 <script>
-        document.addEventListener('mousemove', (e) => {
-            const glow = document.getElementById('mouse-glow');
-            glow.style.setProperty('--x', `${e.clientX}px`);
-            glow.style.setProperty('--y', `${e.clientY}px`);
-            glow.style.opacity = '1';
-        });
-
-        document.querySelectorAll('a.group, button').forEach(el => {
-            el.addEventListener('mousedown', () => { el.style.transform = 'scale(0.96)'; });
+        document.querySelectorAll('a.group').forEach(el => {
+            el.addEventListener('mousedown', () => { el.style.transform = 'scale(0.98)'; });
             el.addEventListener('mouseup', () => { el.style.transform = ''; });
             el.addEventListener('mouseleave', () => { el.style.transform = ''; });
         });
